@@ -1,0 +1,42 @@
+= RubyMotion Documentation
+
+This repository contains the official documentation of RubyMotion, a
+commercial toolchain for iOS development in Ruby.
+
+The files in this repository are used to build the Developer Center section
+of the RubyMotion website.
+
+http://www.rubymotion.com/developer-center
+
+== Setup
+
+Documentation is written using the AsciiDoc text document format. You can find more information about AsciiDoc on its website: http://www.methods.co.nz/asciidoc
+
+We use the Mizuho tool to build the documentation. Mizuho conveniently includes
+AsciiDoc as well as additional functionality.
+
+  $ sudo gem install mizuho
+
+You can also find the source code of Mizuho on GitHub. Mizuho is a project of
+Hongli Lai of the amazing Phusion folks. https://github.com/FooBarWidget/mizuho
+
+== Usage
+
+The default +rake+ task will build the documentation by creating a +.html+
+file for each +.txt+ file.
+
+  $ rake
+
+== Contributions
+
+Please use the GitHub pull-request mechanism to submit contributions. We will
+refresh the RubyMotion website on a periodical basis.
+
+Thanks a lot in advance!
+
+== License
+
+This documentation is licensed under a Creative Commons Attribution 3.0
+Unported License.
+
+http://creativecommons.org/licenses/by/3.0/

@@ -1,0 +1,61 @@
+Use CocoaPods Dependencies in RubyMotion Apps
+=============================================
+Laurent Sansonetti <lrz@hipbyte.com>
+
+In this article we will cover how you can integrate the http://cocoapods.org[CocoaPods] dependency manager inside your RubyMotion project.
+
+Synopsis
+--------
+
+CocoaPods is the missing dependency manager for Objective-C projects. It is similar to RubyGems but for Objective-C dependencies.
+
+Dependencies in CocoaPods are called Pods. You can get the list of Pods available from the http://github.com/CocoaPods/Specs[CocoaPods/Specs] GitHub repository.
+
+CocoaPods was originally designed to be integrated in Objective-C Xcode projects, but we worked with the awesome CocoaPods author to make it possible to be used in RubyMotion projects.
+
+You can check the http://cocoapods.org website to get more information about CocoaPods.
+
+Installation
+------------
+
+First, you will need to install and setup CocoaPods, unless you already have.
+
+----
+$ sudo gem install cocoapods
+$ pod setup
+----
+
+The RubyMotion CocoaPods integration also comes as a gem. 
+
+----
+$ sudo gem install motion-cocoapods
+----
+
+The code lives in the http://github.com/HipByte/motion-cocoapods[HipByte/motion-cocoapods] GitHub repository.
+
+Usage
+-----
+
+You will need to require the gem inside the 'Rakefile' of your project.
+
+----
+require 'motion-cocoapods'
+----
+
+Once you do that, you can simply use the +pods+ method of the application configuration object to describe the Pods you want to require, by using the same expressions as you would do in a regular Podfile.
+
+For instance, if you want to require the +JSONKit+ Pod.
+
+----
+Motion::Project::App.setup do |app|
+  # ...
+  app.pods do
+    dependency 'JSONKit'
+  end
+end
+----
+
+That's all you have to do.
+
+The next time you build your project, the +JSONKit+ sources will be downloaded then built and linked against your application executable. If you require a Pod that has dependencies, they will also be properly honored.
+
