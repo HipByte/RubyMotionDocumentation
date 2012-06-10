@@ -1,0 +1,45 @@
+Setting up your editor to work with RubyMotion
+==============================================
+Laurent Sansonetti <lrz@hipbyte.com>
+
+RubyMotion was designed so that developers do not need to switch to a particular editor or IDE in order to use it and can simply keep using the text editor they already know and love.
+
+This article covers the text editors that provide support for RubyMotion. We try to keep this article up-to-date following the contributions from the community.
+
+TextMate
+--------
+
+http://macromates.com/[TextMate] is a popular editor on OSX.
+
+A https://github.com/libin/RubyMotion.tmbundle[RubyMotion.tmbundle] plugin is available. It provides code completion and an integration with the build system. It is developed by https://github.com/libin[Libin Pan].
+
+Sublime Text
+------------
+
+http://www.sublimetext.com/[Sublime Text] is a relatively new editor for OSX that is gaining a lot of interest.
+
+https://github.com/haraken3/SublimeRubyMotionBuilder[SublimeRubyMotionBuilder] is a plugin that provides code completion and an integration with the build system. It is developed by https://github.com/haraken3[Kentaro Hara].
+
+Redcar
+------
+
+http://redcareditor.com/[Redcar] is an Open Source editor written in Ruby.
+
+https://github.com/kattrali/redcar-rubymotion[redcar-rubymotion] is a plugin that integrates the RubyMotion workflow in Redcar. All features of RubyMotion are integrated. It is developed by https://github.com/kattrali[Delisa Mason].
+
+Vim
+---
+
+http://www.vim.org/[Vim] is the most popular clone of http://en.wikipedia.org/wiki/Vi[vi]. Vim ships in OSX. http://code.google.com/p/macvim/[MacVim] is a flavor of Vim for OSX that runs outside the terminal.
+
+The builtin +rake ctags+ task can be used to generate a +tags+ file containing all the APIs the project can call into. This file can then be used to automatically complete API calls in the editor. RubyMotion uses http://ctags.sourceforge.net/[Exuberant Ctags]. Ctags is a format understood by a variety of text editors, Vim included.
+
+Better auto-completion can be provided by using the SnipMate plugin by following https://gist.github.com/2652913[instructions], courtesy of https://github.com/shayarnett[Shay Arnett].
+
+Emacs
+-----
+
+http://www.gnu.org/software/emacs/[Emacs] is a popular text editor. Emacs ships in OSX.
+
+It is possible to configure RubyMotion to emit a +tags+ file readable by Emacs by following the instructions in http://stirredbits.com/blog/2012/05/06/rubymotion-completion-with-emacs/[this article].
+
