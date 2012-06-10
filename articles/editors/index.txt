@@ -16,7 +16,7 @@ A https://github.com/libin/RubyMotion.tmbundle[RubyMotion.tmbundle] plugin is av
 Sublime Text
 ------------
 
-http://www.sublimetext.com/[Sublime Text] is a relatively new editor for OSX that is gaining a lot of interest.
+http://www.sublimetext.com/[Sublime Text] is a relatively new editor for Windows, OS X and Linux that is gaining a lot of interest.
 
 https://github.com/haraken3/SublimeRubyMotionBuilder[SublimeRubyMotionBuilder] is a plugin that provides code completion and an integration with the build system. It is developed by https://github.com/haraken3[Kentaro Hara].
 
