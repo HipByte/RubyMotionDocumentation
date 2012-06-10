@@ -214,6 +214,21 @@ The following steps are performed during the build process:
 
 Normally the user does not need to explicitly build the project, as the 'build' task is a dependency of the other tasks.
 
+Xcode Resource Files
+~~~~~~~~~~~~~~~~~~~~
+
+The build system will detect the following Xcode resource files in the 'resources' directory and properly compile them and copy the result into the generated '.app' bundle.
+
+[options="header,autowidth"]
+|=========================
+| Source Extension | Compiled Extension | Description 
+| '.xib' | '.nib' | Interface Builder files.
+| '.storyboard' |  '.storyboardc' | Storyboard files.
+| '.xcdatamodeld' | '.momd' | CoreData model files.
+|=========================
+
+The compiled files will be removed by 'rake clean'.
+
 Parallel Compilation
 ~~~~~~~~~~~~~~~~~~~~
 
