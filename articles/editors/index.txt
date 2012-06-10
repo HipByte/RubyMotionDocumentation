@@ -11,7 +11,7 @@ TextMate
 
 http://macromates.com/[TextMate] is a popular editor on OSX.
 
-A https://github.com/libin/RubyMotion.tmbundle[RubyMotion.tmbundle] plugin is available. It provides code completion and an integration with the build system. It is developed by https://github.com/libin[Libin Pan].
+A https://github.com/libin/RubyMotion.tmbundle[RubyMotion.tmbundle] plugin is available. It provides code completion and an integration with the build system. It is developed by https://github.com/libin[Libin Pan] and https://github.com/berklee[Berklee].
 
 Sublime Text
 ------------
