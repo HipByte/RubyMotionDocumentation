@@ -114,9 +114,9 @@ After this change, the build system will compile 'foo.rb' before 'bar.rb'.
 Using 3rd-Party Libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The iOS SDK has a significant amount of functionality built-in that one can use from a RubyMotion project, however, sometimes you will have to use a 3rd-party library that provides a missing feature of iOS.
+The iOS SDK has a significant amount of functionality built-in that you can use in your RubyMotion project. However, sometimes you will have to use a 3rd-party library that provides a feature missing from iOS.
 
-To vendor a 3rd-party library in a RubyMotion project, the source code must be available somewhere on the filesystem. It is recommended to keep the 3rd-party libraries required by the project at the same place, for instance under a 'vendor' directory.
+To vendor a 3rd-party library in a RubyMotion project, the source code must be available somewhere on the filesystem. It is recommended to keep the 3rd-party libraries required by the project in the same place, for instance under a 'vendor' directory.
 
 The +vendor_project+ method can be called from the 'Rakefile'. Its first argument must be the path to the 3rd-party library, for example +"vendor/OAuth2Client"+. Its second argument must be a symbol representing the project type, like +:xcode+. Other arguments can be provided as a list of key/value objects.
 
@@ -126,8 +126,8 @@ Here is a table summarizing project types and key/value objects.
 |====
 | Project Type | Key | Discussion
 .6+|+:xcode+ | +:xcodeproj+ | Name of the Xcode project file to use. Optional if there is one '.xcodeproj' file in the directory.
-| +:target+ | Name of the target to build. If not provided, the default target will be used. Cannot be used at the same time than +:scheme+.
-| +:scheme+ | Name of the scheme to build. If not provided, the default scheme will be used. Cannot be used at the same time than +:target+.
+| +:target+ | Name of the target to build. If not provided, the default target will be used. Cannot be defined at the same time as +:scheme+.
+| +:scheme+ | Name of the scheme to build. If not provided, the default scheme will be used. Cannot be defined at the same time as +:target+.
 | +:configuration+ | Name of the configuration to build. If not provided, +"Release"+ will be used.
 | +:headers_dir+ | Path to the directory that contains public headers files, declaring APIs that will be used by the RubyMotion project. The path should be relative to the path provided to +vendor_project+, for example +"Sources/Headers"+. This key is optional.
 | +:products+ | An +Array+ containing the names of products to use in the RubyMotion project, for example +["libfoo.a"]+. This key can be used when the project builds more than one product and you want to filter what will be used by the app. If not provided, all +.a+ libraries built will be used.
@@ -135,7 +135,7 @@ Here is a table summarizing project types and key/value objects.
 | +:headers_dir+ | Path to the directory that contains public headers files, declaring APIs that will be used by the RubyMotion project. The path should be relative to the path provided to +vendor_project+, for example +"include"+. The default value is the vendor project directory.
 |====
 
-As an example, assuming our video player project wants to make use of the OAuth2Client 3rd-library library, a 'vendor' directory would be created and the OAuth2Client source code would be added there.
+Continuing our example from above, assuming our video player project wants to make use of the OAuth2Client 3rd-library library, a 'vendor' directory would be created and the OAuth2Client source code would be added there.
 
 ----
 $ cd AwesomeVideoPlayer
@@ -180,7 +180,7 @@ end
 Advanced Info.plist Settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An iOS app has its configuration described into the 'Info.plist' file, which is located inside the application bundle. This file contains a set of keys and values. It is fully documented in the http://developer.apple.com/library/ios/#documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html[Info.plist reference] guide.
+An iOS app has its configuration defined in the 'Info.plist' file, which is located inside the application bundle. This file contains a set of keys and values. It is fully documented in the http://developer.apple.com/library/ios/#documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html[Info.plist reference] guide.
 
 In a RubyMotion project, the 'Info.plist' file is derived from the configuration object exposed in the 'Rakefile' file. For example, the +CFBundleName+ variable in 'Info.plist' is derived from the +name+ variable in the 'Rakefile'. Most of the time, the configuration object will let you control the necessary settings of his project.
 
@@ -209,7 +209,7 @@ The following steps are performed during the build process:
 
 . It compiles each Ruby source code file into optimized machine code, translating the Ruby syntax tree into an intermediate representation language (using http://llvm.org[LLVM]), then assembly. The compiler will generate code for either the Intel 32-bit (+i386+) or ARM (+armv6+, +armv7+) instruction sets and ABIs depending on the target.
 . It links the machine code with the RubyMotion runtime statically to form an executable. The linker also includes metadata for the C APIs that the project uses, as well as 3rd-party libraries vendored from the configuration.
-. It creates an '.app' bundle and copies the executable there. The 'Info.plist' file is generated based on the project configuration. Each resource file in the 'resources' directory is copied in the bundle. Old resource files, that have been deleted since from the project, will not be present in the application bundle.
+. It creates an '.app' bundle and copies the executable there. The 'Info.plist' file is generated based on the project configuration. Each resource file in the 'resources' directory is copied in the bundle. Old resource files, that have since been deleted from the project, will not be present in the application bundle.
 . It codesigns the bundle based on the certificate, the provisioning profile and the entitlements specified in the project configuration.
 
 Normally the user does not need to explicitly build the project, as the 'build' task is a dependency of the other tasks.
@@ -247,7 +247,7 @@ $ rake jobs=1        # Force compilation tasks to be sequential.
 Cleaning
 ~~~~~~~~
 
-The +rake clean+ task empties the 'build' directory and clean the build directories of the vendored projects.
+The +rake clean+ task empties the 'build' directory and cleans the build directories of the vendored projects.
 
 ----
 $ rake clean
@@ -272,18 +272,18 @@ An interactive shell, similar to Ruby's own +irb+ command, is available when you
 
 You can evaluate any expression in the shell. The shell does not block the app from running, but expressions typed into it will be sent to the app which will execute them in the main thread.
 
-NOTE: The REPL (read-eval-print-loop) support is loaded at demand in the app. By default, an app built for the simulator does not contain any more code than an app built for an iOS device.
+NOTE: The REPL (read-eval-print-loop) support is loaded on demand in the app. By default, an app built for the simulator does not contain any more code than an app built for an iOS device.
 
-You can type +help+ to get more information about the builtin expressions.
+You can type +help+ to get more information about the built-in expressions.
 
-The interactive shell also features a way to select views in the simulator. Maintain the +command+ key then move your mouse over the simulator window and you should see red borders around views you are selecting as well as the object in the shell. Once you click, the shell will open a new session whose context (the +self+ object) is the view you selected.
+The interactive shell also features a way to select views in the simulator. Hold the +command+ key while moving your mouse over the simulator window and you should see red borders around views you are selecting as well as the object in the shell. Once you click, the shell will open a new session whose context (the +self+ object) is the view you selected.
 
 Universal Applications
 ~~~~~~~~~~~~~~~~~~~~~~
 
 A universal application targets both the iPhone and iPad device families (see the +device_family+ project configuration setting for more details).
 
-In this case, it can be convenient to specify which device family the simulator should use. By default, the simulator will use the first device family provided in the project configuration setting.
+In some cases it can be convenient to specify which device family the simulator should use. By default, the simulator will use the first device family provided in the project configuration setting.
 
 The +device_family+ environment variable can be set to either +iphone+ or +ipad+ to change this default. For example, forcing a universal application to run on the iPad.
 
@@ -357,9 +357,9 @@ Development vs Release
 
 A RubyMotion project can be built for development or release. A project is built for development when you run it in the simulator, or push it to your development device. A project is built for release when you're generating an archive for an App Store submission.
 
-Currently, the only difference between a RubyMotion app built for release and one built for development is that all symbols are stripped from the main executable. This process removes about 1MB of data from the app bundle, but at the same time, makes debugging more difficult, which is why it's not applied in development. 
+Currently, the only difference between a RubyMotion app built for release and one built for development is that all symbols are stripped from the main executable. This process removes about 1MB of data from the app bundle, but at the same time makes debugging more difficult, which is why it's not applied in development. 
 
-Sometimes, you want to apply different settings in the 'Rakefile' if the project builds for release. This can be done by using the +development+ and +release+ methods on the configuration object, which will yield the given block in case the project builds for the appropriate mode.
+Sometimes, you want to apply different settings in the 'Rakefile' if the project builds for release. This can be done by using the +development+ and +release+ methods on the configuration object. These methods will yield the given block for the specified build mode.
 
 ----
 Motion::Project::App.setup do |app|

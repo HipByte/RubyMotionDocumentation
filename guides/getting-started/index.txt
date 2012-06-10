@@ -3,19 +3,19 @@ Welcome to RubyMotion
 Laurent Sansonetti <lrz@hipbyte.com>
 
 
-Thank you for purchasing RubyMotion. This guide will help you getting started with the product.
+Thank you for purchasing RubyMotion. This guide will help you get started with the product.
 
 Overview
 --------
 
 http://www.rubymotion.com[RubyMotion] is a toolchain that permits the development of iOS applications using the Ruby programming language.
 
-http://www.apple.com/ios[iOS] is Apple's mobile operating system, powering a variety of devices such as iPhone, iPod touch and iPad. Developers can write applications for iOS and submit them to the App Store, Apple's application distribution system.
+http://www.apple.com/ios[iOS] is Apple's mobile operating system, powering a variety of devices such as the iPhone, iPod touch and iPad. Developers can write applications for iOS and submit them to the App Store, Apple's application distribution system.
 
 Conceptually, RubyMotion is a combination of two major components:
 
-* *Runtime*: a brand-new implementation of the Ruby language, tightly integrated with the native iOS runtime and optimized for embedded iOS device constraints.
-* *Project Management*: a command-line interface to create, manage and interactively develop RubyMotion projects. It also includes a static compiler that compiles Ruby into optimized machine code and an interactive console where you can evaluate expressions on the fly and change the way your app behaves in real-time.
+* *Runtime*: A brand-new implementation of the Ruby language, tightly integrated with the native iOS runtime and optimized for embedded iOS device constraints.
+* *Project Management*: A command-line interface to create, manage, and interactively develop RubyMotion projects. It also includes a static compiler that compiles Ruby into optimized machine code and an interactive console where you can evaluate expressions on the fly and change the way your app behaves in real-time.
 
 RubyMotion installs itself into '/Library/RubyMotion'. A symbolic link to the command-line interface is created as '/usr/bin/motion'.
 
@@ -40,7 +40,7 @@ That should open a new page where you can download Xcode.
 
 Once Xcode is installed, you will need to install the Command Line Tools package, required by RubyMotion.
 
-Open the 'Xcode' application from your 'Applications' folder, then go to the 'Preferences' window and click on the 'Downloads' tab. You should see the 'Command Line Tools' package from the list, make sure to hit the 'Install' button.
+Open the 'Xcode' application from your 'Applications' folder, then go to the 'Preferences' window and click on the 'Downloads' tab. You should see the 'Command Line Tools' package in this list, make sure to hit the 'Install' button.
 
 image:/developer-center/guides/getting-started/images/xcode-prefs-download.png["Installing the Command Line Tools package"]
 
@@ -57,20 +57,20 @@ Software Updates
 
 Software updates can be applied via the command-line.
 
-The following command will grab the latest version of RubyMotion from the network and install it. You must be connected to the Internet to perform that command.
+The following command will grab the latest version of RubyMotion from the network and install it. You must be connected to the Internet to successfully update RubyMotion.
 
 ----
 $ sudo motion update
 ----
 
-You can always see the version number of the version of RubyMotion installed on the computer.
+You can run the following command to check the version of RubyMotion installed on your computer.
 
 ----
 $ motion -v
 1.0
 ----
 
-Once a day, the RubyMotion build system pings the software update server in order to see if a new version of RubyMotion is available to install, and accordingly prints a message on your terminal, suggesting you to upgrade.
+Once a day, the RubyMotion build system pings the software update server in order to see if a new version of RubyMotion is available to install. If a new version is available RubyMotion prints a message to your terminal suggesting that you to upgrade.
 
 Support
 -------
@@ -94,7 +94,7 @@ Open your terminal and go to a place where you would like this first project to 
 $ motion create Hello
 ----
 
-This command will create a RubyMotion project in a new directory, called Hello. If this directory already exists or cannot be created, the command will fail.
+This command will create a RubyMotion project in a new directory named Hello. If this directory already exists or cannot be created, the command will fail.
 
 Let's have a look inside.
 
@@ -139,7 +139,7 @@ class AppDelegate
 end
 ----
 
-If you run the +rake+ command again from the terminal, you should be able to see the alert in the simulator.
+If you run the +rake+ command again from the terminal you should be able to see the alert in the simulator.
 
 image:/developer-center/guides/getting-started/images/hello.png["Hello World"]
 
@@ -156,6 +156,6 @@ Congratulations, you successfully created your first RubyMotion program. That wa
 And Now?
 --------
 
-You will find sample code in the https://github.com/HipByte/RubyMotionSamples[Sample Code Repository] on GitHub. Each of the sub-folders is a RubyMotion project as introduced above. You can type +rake+ from their directory to build and run them and check their source code by reading the files in the 'app' directory.
+You will find sample code in the https://github.com/HipByte/RubyMotionSamples[Sample Code Repository] on GitHub. Each of the sub-folders contains a RubyMotion project as introduced above. You can type +rake+ in each directory to build and run them and check their source code by reading the files in the 'app' directory.
 
 Make sure to check the link:/developer-center[Developer Center] for more resources, such as guides, articles and screencasts.
