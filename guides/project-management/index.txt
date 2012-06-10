@@ -276,6 +276,15 @@ The +device_family+ environment variable can be set to either +iphone+ or +ipad+
 $ rake simulator device_family=ipad
 ----
 
+Retina Mode
+~~~~~~~~~~~
+
+It is possible to start the simulator in Retina mode by setting the +retina+ environment variable to +true+.
+
+----
+$ rake simulator retina=true
+----
+
 Cleaning the Sandbox
 ~~~~~~~~~~~~~~~~~~~~
 
