@@ -16,7 +16,7 @@ A https://github.com/libin/RubyMotion.tmbundle[RubyMotion.tmbundle] plugin is av
 Sublime Text
 ------------
 
-http://www.sublimetext.com/[Sublime Text] is a relatively new editor for OS X that is gaining a lot of interest.
+http://www.sublimetext.com/[Sublime Text] is a relatively new editor for OS X, Windows and Linux that is gaining a lot of interest.
 
 https://github.com/haraken3/SublimeRubyMotionBuilder[SublimeRubyMotionBuilder] is a plugin that provides code completion and an integration with the build system. It is developed by https://github.com/haraken3[Kentaro Hara].
 
@@ -34,7 +34,7 @@ http://www.vim.org/[Vim] is the most popular clone of http://en.wikipedia.org/wi
 
 The builtin +rake ctags+ task can be used to generate a +tags+ file containing all the APIs the project can call into. This file can then be used to automatically complete API calls in the editor. RubyMotion uses http://ctags.sourceforge.net/[Exuberant Ctags]. Ctags is a format understood by a variety of text editors, Vim included.
 
-Better auto-completion can be provided by using the SnipMate plugin by following https://gist.github.com/2652913[instructions], courtesy of https://github.com/shayarnett[Shay Arnett].
+Better auto-completion can be provided by using the https://github.com/rcyrus/snipmate-snippets-rubymotion[snipmate-snippets-rubymotion] plugin, courtesy of https://github.com/rcyrus[Rajeev Cyrus].
 
 Emacs
 -----
