@@ -155,7 +155,7 @@ Here is a table showing the ancestors chain of a newly created class, +Hello+, a
 A direct consequence of hosting the Ruby built-in classes on Foundation is that instances respond to more messages. For instance, the +NSString+ class defines the +uppercaseString+ method. Since the +String+ class is a subclass of +NSString+, strings created in Ruby also respond to that method.
 
 ----
-'hello'.uppercaseString # => 'HELLO
+'hello'.uppercaseString # => 'HELLO'
 ----
 
 Conversely, the Ruby interface of these built-in classes is implemented on their Foundation counterparts. For example, +Array+'s +each+ method is implemented on +NSArray+. This allows primitive types to always respond to the same interface, regardless of where they come from. +each+ will always work on all arrays.
