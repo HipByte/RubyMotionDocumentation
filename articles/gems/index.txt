@@ -46,9 +46,9 @@ end
 Adding source files
 -------------------
 
-A Gem can add files to a RubyMotion project, simply by opening the +Motion::Project::App+ block and append their paths to the +app.files+ variable.
+A Gem can add files to a RubyMotion project, simply by opening the +Motion::Project::App+ block and appending their paths to the +app.files+ variable.
 
-As an example, let's assume the +foo+ gem has a bunch of files under the 'lib/foo' directory that are intended to be mixed in a RubyMotion project.
+As an example, let's assume the +foo+ gem has a bunch of files under the 'lib/foo' directory that are intended to be mixed in to a RubyMotion project.
 
 ----
 foo.gemspec
