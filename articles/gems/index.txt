@@ -1,0 +1,138 @@
+Writing Ruby gems for RubyMotion
+================================
+Laurent Sansonetti <lrz@hipbyte.com>
+
+RubyMotion projects can be extended through the use of RubyGems, the Ruby de-facto packaging system. This article will cover how to write RubyMotion-specific gems.
+
+This article was inspired by http://reality.hk/posts/2012/05/22/create-gems-for-rubymotion[Create gems for RubyMotion], by Francis Chong.
+
+Getting started
+---------------
+
+RubyMotion being a statically-built flavor of the Ruby language, existing Ruby gems will not work out of the box in RubyMotion. RubyMotion gems need to be specifically architectured for RubyMotion itself.
+
+In RubyMotion, gems are required in a project's 'Rakefile' and are responsible to extend the project's configuration, for instance by adding files to the project or introducing new settings or +rake+ tasks.
+
+In this article we will work with the fictional +foo+ gem, which has the following file tree.
+
+----
+foo.gemspec
+lib
+  foo.rb
+----
+
+The +foo+ gem can be used in a RubyMotion project simply by requiring it in its 'Rakefile'.
+
+----
+$:.unshift("/Library/RubyMotion/lib")
+require 'motion/project'
+
+require 'rubygems'
+require 'foo'
+
+# ...
+----
+
+NOTE: the +require "rubygems"+ line is not necessary if you use Ruby 1.9.
+
+The +foo.rb+ file is the entry point of the gem.  It is a good idea to protect this file from being required outside RubyMotion, by adding the following code.
+
+----
+unless defined?(Motion::Project::Config)
+  raise "This file must be required within a RubyMotion project Rakefile."
+end
+----
+
+Adding source files
+-------------------
+
+A Gem can add files to a RubyMotion project, simply by opening the +Motion::Project::App+ block and append their paths to the +app.files+ variable.
+
+As an example, let's assume the +foo+ gem has a bunch of files under the 'lib/foo' directory that are intended to be mixed in a RubyMotion project.
+
+----
+foo.gemspec
+lib
+  foo.rb
+  foo
+    foo-model.rb
+    foo-view.rb
+    foo-controller.rb
+----
+
+The 'lib/foo.rb' file can be modified as such.
+
+----
+unless defined?(Motion::Project::Config)
+  raise "This file must be required within a RubyMotion project Rakefile."
+end
+
+Motion::Project::App.setup do |app|
+  Dir.glob(File.join(File.dirname(__FILE__), 'foo/*.rb')).each do |file|
+    app.files.unshift(file)
+  end
+end
+----
+
+The 'foo-model.rb', 'foo-view.rb' and 'foo-controller.rb' files will be compiled and used by the build system before any other files in the project.
+
+Adding dependencies
+-------------------
+
+The +foo+ gem is not limited to adding source files. Since it has access to the +Motion::Project::Config+ object, it has access to the same set of project settings a RubyMotion project does.
+
+For instance, we can assume that our +foo+ gem comes with Objective-C source code.
+
+----
+foo.gemspec
+lib
+  foo.rb
+  ...
+vendor
+  native-foo
+    native-foo-model.{m,h}
+    native-foo-view.{m,h}
+    native-foo-controller.{m,h}
+----
+
+This code requires the +CoreData+ framework to be linked with the app.
+
+We can change the 'foo.rb' file accordingly to vendor the native code and set a framework dependency.
+
+----
+unless defined?(Motion::Project::Config)
+  raise "This file must be required within a RubyMotion project Rakefile."
+end
+
+Motion::Project::App.setup do |app|
+  Dir.glob(File.join(File.dirname(__FILE__), 'foo/*.rb')).each do |file|
+    app.files.unshift(file)
+  end
+  app.vendor_project(File.expand_path(File.join(File.dirname(__FILE__), '../vendor/native-foo')), :static)
+  app.frameworks += ['CoreData']
+end
+----
+
+Adding +rake+ tasks
+-------------------
+
+A RubyMotion gem can also very easily extend the build system to introduce new +rake+ tasks. 
+
+Since the 'foo.rb' file is required within the RubyMotion project 'Rakefile', it's just a matter of defining the tasks there.
+
+As an example, let's define the +foo+ task which would connect to an imaginary service.
+
+----
+unless defined?(Motion::Project::Config)
+  raise "This file must be required within a RubyMotion project Rakefile."
+end
+
+Motion::Project::App.setup do |app|
+  ...
+end
+
+desc "Submit your code to the foo service"
+task :foo do
+  ...
+end
+----
