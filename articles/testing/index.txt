@@ -1,0 +1,425 @@
+Writing Tests for RubyMotion Apps
+=================================
+
+This document describes how to write functional tests for an existing RubyMotion app. Tests provide a set of specifications an application is supposed to conform to and can be used to catch regressions after an unfortunate change in the code. 
+
+Getting Started
+---------------
+
+RubyMotion integrates https://github.com/chneukirchen/bacon/[Bacon], a small clone of the popular http://rspec.info/[RSpec] framework written by https://github.com/chneukirchen[Christian Neukirchen].
+
+More specifically, RubyMotion uses a version of Bacon called https://github.com/alloy/MacBacon[MacBacon] which has been extended to integrate well with iOS. MacBacon is maintained by https://github.com/alloy[Eloy Duran].
+
+Spec Files
+~~~~~~~~~~
+
+Spec files are responsible to contain the tests of your project.
+
+Spec files are created under the 'spec' directory of a RubyMotion project.
+
+By default, a RubyMotion project has a 'spec/main_spec.rb' file which contains a single test that ensures that the application has a window.
+
+Spec Helpers
+~~~~~~~~~~~~
+
+Spec helpers can be used to extend the testing framework, for instance by introducing a common set of classes or methods that will be used by the spec files. Spec helpers will be compiled and executed before the actual spec files.
+
+Spec helpers are created under the 'spec/helpers' directory of a RubyMotion project. An example could be 'spec/helpers/extension.rb'.
+
+By default, a RubyMotion project has no spec helper.
+
+Running the Tests
+~~~~~~~~~~~~~~~~~
+
+The +spec+ Rake task can be used to run the test suite of a RubyMotion project.
+
+----
+$ rake spec
+----
+
+This command compiles a special version of your app that includes the spec framework, helpers and files and executes it in the simulator in the background.
+
+Once the specs are performed, the program yields back to the command-line prompt with a proper status code (+0+ in case of success, +1+ otherwise).
+
+Run Selected Spec Files
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you may not want to run the entire test suite but only one or more isolated spec files.
+
+The +files+ environment variable can be set to a series of comma-delimited patterns in order to filter the spec files that should be executed. Patterns can be either the basename of a spec file (without the file extension) or its path.
+
+As an example, the following command will only run the 'spec/foo_spec.rb' and 'spec/bar_spec.rb' files.
+
+----
+$ rake spec files=foo_spec,spec/bar_spec.rb
+----
+
+Output Format
+~~~~~~~~~~~~~
+
+It is possible to customize the output format of +rake spec+ by specifying a value for the +output+ environment variable. Possible output formats are: +spec_dox+ (default), +fast+, +test_unit+, +tap+ and +knock+.
+
+----
+$ rake spec output=test_unit
+----
+
+Basic Testing
+-------------
+
+You can refer to MacBacon's https://github.com/alloy/MacBacon/blob/master/README.md[README] file for a list of assertions and core predicates that the framework supports.
+
+Views and Controllers Testing
+-----------------------------
+
+This layer lets you write functional tests for your controllers and interact with its views through
+a set of high-level event generating APIs, by leveraging the functionality of Apple's http://developer.apple.com/library/ios/#documentation/DeveloperTools/Reference/UIAutomationRef/_index.html[UIAutomation] framework without forcing you to write the tests in Javascript.
+
+This consists of a small API available to your specifications, some runloop helpers, and a couple
+of `UIView` extensions.
+
+IMPORTANT: This is **not** meant for full application acceptance tests. Therefore you should not let the application launch as normal. This can, for instance, be done by using the +RUBYMOTION_ENV+ to return early from +application:didFinishLaunchingWithOptions:+:
+
+----
+class AppDelegate
+  def application(application, didFinishLaunchingWithOptions:launchOptions)
+    return true if RUBYMOTION_ENV == 'test'
+    # ...
+----
+
+Configuring your Context
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You need to tell the specification context which controller will be specified and extend it with
+the required API. You do this by specifying your view controller class in the following way:
+
+----
+describe "The 'taking over the world' view" do
+  tests TakingOverTheWorldViewController
+
+  # Add your specifications here.
+end
+----
+
+This will, before each specification, instantiate a new window and a new instance of your view
+controller class. These are available in your specifications as `window` and `controller`.
+
+TIP: If you need to perform custom instantiation of either the window or controller then you can
+     do so from a `before` filter __before__ calling `tests`.
+
+
+Durations
+~~~~~~~~~
+
+Some methods take a `:duration` option which specifies the period of time, in seconds, during which
+events will be generated. This is **always** optional.
+
+TIP: The default duration value can be changed through `Bacon::Functional.default_duration=`.
+
+
+Device Events
+~~~~~~~~~~~~~
+
+These methods generate events that operate on the device level. As such, they don’t take an
+accessibility label or specific view.
+
+rotate_device
+^^^^^^^^^^^^^
+
+Rotates the device to the specified orientation.
+
+----
+rotate_device(:to => orientation, :button => location)
+----
+
+*     **to**: The orientation to rotate the device to, which can be either `:portrait` or `:landscape`.
+* **button**: Used to indicate a specific portrait/landscape orientation which can be either
+              `:bottom` or `:top` in portrait mode, or either `:left` or `:right` in landscape
+              mode. If omitted, it will default to `:bottom` in portrait mode and `:left` in
+              landscape mode.
+
+The following example rotates the device to the landscape orientation with the home button on the
+left-hand side of the device:
+
+----
+rotate_device :to => :landscape
+----
+
+Or to have the button on the right-hand side of the device:
+
+----
+rotate_device :to => :landscape, :button => :right
+----
+
+accelerate
+^^^^^^^^^^
+
+Generates accelerometer events.
+
+----
+accelerate(:x => x_axis_acceleration, :y => y_axis_acceleration,
+           :z => z_axis_acceleration, :duration => duration)
+----
+
+From the http://bit.ly/nWAu5X[UIAcceleration class reference]:
+
+* **x**: With the device held in portrait orientation and the screen facing you, the x axis runs
+         from left (negative values) to right (positive values) across the face of the device.
+* **y**: With the device held in portrait orientation and the screen facing you, the y axis runs
+         from bottom (negative values) to top (positive values) across the face of the device.
+* **z**: With the device held in portrait orientation and the screen facing you, the z axis runs
+         from back (negative values) to front (positive values) through the device.
+
+This will simulate a device laying still on its back:
+
+----
+accelerate :x => 0, :y => 0, :z => -1
+----
+
+shake
+^^^^^
+
+Essentially generates accelerometer events.
+
+----
+shake()
+----
+
+Use this when you want to specifically trigger a shake motion event.
+
+For more information see the http://bit.ly/MV57Y9[event handling guide].
+
+Finding Views
+~~~~~~~~~~~~~
+
+These methods allow you to retrieve views. They traverse down through the view hierarchy, starting
+from the current `window`.
+
+If no view matches, then they will keep re-trying it during the `timeout`, which defaults to three
+seconds. This means you don’t need to worry about wether or not the view you’re looking for is
+still being loaded or animated.
+
+Finally, if the timeout passes and **no** view matches an exception will be raised.
+
+TIP: The default timeout value can be changed through `Bacon::Functional.default_timeout=`.
+
+view
+^^^^
+
+Returns the view that matches the specified accessibility label.
+
+----
+view(label)
+----
+
+Example:
+
+----
+button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+button.setTitle('Take over the world', forState:UIControlStateNormal)
+window.addSubview(button)
+
+view('Take over the world') # => button
+----
+
+TIP: See `UIView#viewByName(accessibilityLabel, timeout)`.
+
+views
+^^^^^
+
+Returns an array of all the views that match the given class.
+
+----
+views(view_class)
+----
+
+Example:
+
+----
+button1 = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+button1.setTitle('Take over the world', forState:UIControlStateNormal)
+window.addSubview(button1)
+
+button2 = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+button2.setTitle('But not tonight', forState:UIControlStateNormal)
+window.addSubview(button2)
+
+views(UIButton) # => [button1, button2]
+----
+
+TIP: See `UIView#viewsByClass(viewClass, timeout)`.
+
+View Events
+~~~~~~~~~~~
+
+These methods all operate on views. You specify the view to operate on by its ‘accessibility label’
+or pass in a view instance.
+
+NOTE: In general all the UIKit controls will have decent default values for their accessibility
+      labels. E.g. a UIButton with title “Take over the world” will have the same value for its
+      accessibility label. If, however, you have custom views, or otherwise need to override the
+      default, then you can do so by setting its `accessibilityLabel` attribute.
+
+Wherever a ‘location’ is required you can either specify a `CGPoint` instance or use one of the
+following constants:
+
+* `:top_left`
+* `:top`
+* `:top_right`
+* `:right`
+* `:bottom_right`
+* `:bottom`
+* `:bottom_left`
+* `:left`
+
+NOTE: `CGPoint` instances have to be specified in window coordinates.
+
+TIP: Some of the methods take a `:from` location and a `:to` location option. If __only__ `:from`
+     or `:to` is specified and __with__ a location constant, then the other option can be omitted
+     and will default to the opposite of the specified location. If, however, a `CGPoint` instance
+     is used, then the other option __has__ to be specified as well.
+
+tap
+^^^
+
+Generates events that simulate tapping a view.
+
+----
+tap(label_or_view, :at => location, :times => number_of_taps, :touches => number_of_fingers)
+----
+
+All of these options are optional:
+
+*      **at**: The location where the tap will occur. Defaults to the center of the view.
+*   **times**: The number of times to tap the view. Defaults to a single tap.
+* **touches**: The number of fingers used to tap the view. Defaults to a single touch.
+
+Tapping a view __once__ only requires:
+
+----
+button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+button.setTitle('Take over the world', forState:UIControlStateNormal)
+window.addSubview(button)
+
+tap 'Take over the world'
+----
+
+Tapping a view twice with two fingers requires you to specify those options:
+
+----
+view = UIView.alloc.initWithFrame(CGRectMake(0, 0, 100, 100))
+view.accessibilityLabel = 'tappable view'
+recognizer = UITapGestureRecognizer.alloc.initWithTarget(self, action:'handleTap:')
+recognizer.numberOfTapsRequired = 2
+recognizer.numberOfTouchesRequired = 2
+view.addGestureRecognizer(recognizer)
+
+tap 'tappable view', :times => 2, :touches => 2
+----
+
+flick
+^^^^^
+
+Generates a short fast drag gesture.
+
+----
+flick(label_or_view, :from => location, :to => location, :duration => duration)
+----
+
+* **from**: The location where the drag will start.
+*   **to**: The location where the drag will end.
+
+Flicking a switch would be done like so:
+
+----
+switch = UISwitch.alloc.initWithFrame(CGRectMake(0, 0, 100, 100))
+switch.accessibilityLabel = 'Enable rainbow theme'
+window.addSubview(switch)
+
+flick 'Enable rainbow theme', :to => :right
+----
+
+pinch_open
+^^^^^^^^^^
+
+Generates an __opening__ pinch gesture.
+
+----
+pinch_open(label_or_view, :from => location, :to => location, :duration => duration)
+----
+
+* **from**: The location where __both__ fingers are at the start of the gesture. Defaults to
+            `:left`.
+*   **to**: The location where the __moving__ finger will be at the end of the gesture. Defaults to
+            `:right`.
+
+The following zooms in on the content view of a `UIScrollView`:
+
+----
+view('Zooming scrollview').zoomScale # => 1.0
+pinch_open 'Zooming scrollview'
+view('Zooming scrollview').zoomScale # => 2.0
+----
+
+pinch_close
+^^^^^^^^^^^
+
+Generates a __closing__ pinch gesture.
+
+----
+pinch_close(label_or_view, :from => location, :to => location, :duration => duration)
+----
+
+* **from**: The location where the __moving__ finger will be at the start of the gesture. Defaults
+            to `:right`.
+*   **to**: The location where __both__ fingers are at the end of the gesture. Defaults to `:left`.
+
+The following zooms out of the content view of a `UIScrollView`:
+
+----
+view('Zooming scrollview').zoomScale # => 1.0
+pinch_close 'Zooming scrollview'
+view('Zooming scrollview').zoomScale # => 0.5
+----
+
+drag
+^^^^
+
+Generates a drag gesture (i.e. panning, scrolling) over a path interpolated between the start and
+end location.
+
+----
+drag(label_or_view, :from => location, :to => location, :number_of_points => steps,
+     :points => path, :touches => number_of_fingers, :duration => duration)
+----
+
+*             **from**: The location where the drag will start. Not used if `:points` is specified.
+*               **to**: The location where the drag will end. Not used if `:points` is specified.
+* **number_of_points**: The number of points along the path that is interpolated between `:from`
+                        and `:to`. Defaults to 20. Not used if `:points` is specified.
+*           **points**: An array of `CGPoint` instances that specify the drag path.
+*          **touches**: The number of fingers used to drag. Defaults to a single touch.
+
+NOTE: Keep in mind that **scrolling** into a direction means **dragging** into the __opposite__
+      direction.
+
+The following will scroll down in a scroll view:
+
+----
+view('Scrollable scrollview').contentOffset.y # => 0
+drag 'Scrollable scrollview', :from => :bottom
+view('Scrollable scrollview').contentOffset.y # => 400
+----
+
+rotate
+^^^^^^
+
+Generates a clockwise rotation gesture around the center point of the view.
+
+----
+rotate(label_or_view, :radians => angle, :degrees => angle, :touches => number_of_fingers,
+       :duration => duration)
+----
+
+* **radians**: The angle of the rotation in radians. Defaults to π.
+* **degrees**: The angle of the rotation in degrees. Defaults to 180.
+* **touches**: The number of fingers used to rotate. Defaults to 2.
