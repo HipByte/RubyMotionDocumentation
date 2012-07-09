@@ -295,10 +295,10 @@ Functions
 
 C functions are available as methods of the +Object+ class. Inline functions, which are implemented in the framework header files are also supported.
 
-As an example, the +CGMakePoint+ function can be used in Ruby to create a +CGRect+ structure.
+As an example, the +CGPointMake+ function can be used in Ruby to create a +CGRect+ structure.
 
 ----
-pt = CGMakePoint(100, 200)
+pt = CGPointMake(100, 200)
 'Hello'.drawAtPoint(pt, withFont: font)
 ----
 
