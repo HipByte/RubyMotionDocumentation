@@ -110,19 +110,15 @@ Storyboards
 ^^^^^^^^^^^
 
 You can test controllers from a http://developer.apple.com/library/ios/#DOCUMENTATION/UIKit/Reference/UIStoryboard_Class/Reference/Reference.html[storyboard]
-by passing the `tests` method the `:id` option:
+by passing the `tests` method the Xcode identifier of the controller in the `:id` option:
 
 ----
 tests StoryboardViewController, :id => 'controller-id'
 ----
 
-*         **id**: The value of the __Identifier__ field as set in Xcode.
-* **storyboard**: The name of the __.storyboard__ file in the project __resources__ directory.
-                  Defaults to __MainStoryboard__.
-
-The Xcode templates use __MainStoryboard__ for the storyboard name by
-default, so you should only need to specify the `:storyboard` option if
-the storyboard name has been changed to something else.
+By default, controllers will be loaded from the __MainStoryboard.storyboard__ file in the project
+__resources__ directory. You can load a controller from a different file by passing the storyboard
+name in the `:storyboard` option.
 
 ----
 tests StoryboardViewController, :storyboard => 'AlternateStoryboard', :id => 'controller-id'
