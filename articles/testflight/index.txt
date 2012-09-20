@@ -7,17 +7,17 @@ In this article we will cover how you can submit development builds of your Ruby
 Synopsis
 --------
 
-TestFlight is a platform that you can use to distribute development builds of your apps to you team members. You receive feedback, console logs and crash reports automatically. It can very useful during the development cycle of an app.
+TestFlight is a platform that you can use to distribute development builds of your apps to you team members. You receive feedback, console logs and crash reports automatically. It can be very useful during the development cycle of an app.
 
 You can create an account on http://testflightapp.com[http://testflightapp.com]. It's free.
 
 Installation
 ------------
 
-We recommend the use of the +motion-testflight+ gem which provides a seemingless experience.
+We recommend the use of the +motion-testflight+ gem which provides a seamless experience.
 
 ----
-$ sudo gem install motion-testflight
+$ gem install motion-testflight
 ----
 
 The source code of the +motion-testflight+ gem lives on the http://github.com/HipByte/motion-testflight[HipByte/motion-testflight] GitHub repository.
@@ -25,14 +25,12 @@ The source code of the +motion-testflight+ gem lives on the http://github.com/Hi
 Unpack the SDK
 --------------
 
-You will need to download the TestFlight SDK package from http://testflightapp.com/sdk/download and unpack it into the 'vendor/TestFlightSDK' directory of your RubyMotion project.
+You will need to download the TestFlight SDK package from http://testflightapp.com/sdk/download and unpack it into the 'vendor' directory of your RubyMotion project.
 
-Create the 'vendor' directory if it does not exist.
-
-You should then have something like this.
+The directory structure you need is this:
 
 ----
-$ ls vendor/TestFlightSDK
+$ ls vendor/TestFlight
 README.txt			libTestFlight.a
 TestFlight.h			release_notes.txt
 ----
@@ -42,21 +40,18 @@ Change your project configuration
 
 You will need to change the 'Rakefile' of your project in order to set up the gem.
 
-First, you need to require the gem. Add the following line at the beginning of the file, right after the other +require+ statements.
+First, you need to require the gem. Add the following line at the beginning of the file, right after the other +require+ statements:
 
 ----
 require 'motion-testflight'
 ----
 
-Now that the gem is loaded, it's time to configure it. Inside your application configuration block, add the following lines.
+Now that the gem is loaded, it's time to configure it. Inside your application configuration block, add the following lines:
 
 ----
-Motion::Project::App.setup do |app|
-  # ...
-  app.testflight.sdk = 'vendor/TestFlight'
-  app.testflight.api_token = '<insert your API token here>'
-  app.testflight.team_token = '<insert your team token here>'
-end
+app.testflight.sdk = 'vendor/TestFlight'
+app.testflight.api_token = '<insert your API token here>'
+app.testflight.team_token = '<insert your team token here>'
 ----
 
 You can retrieve the values for +api_token+ and +team_token+ from your TestFlight account page.
@@ -64,10 +59,7 @@ You can retrieve the values for +api_token+ and +team_token+ from your TestFligh
 Optionally, you can use the +distribution_lists+ key if you do want to set up a distribution list for your submissions.
 
 ----
-Motion::Project::App.setup do |app|
-  # ...
-  app.testflight.distribution_lists = ['CoolKids']
-end
+app.testflight.distribution_lists = ['CoolKids']
 ----
 
 Usage
@@ -75,7 +67,7 @@ Usage
 
 You will see that a new rake task is available, +rake testflight+, which will automatically submit a development build of your app to TestFlight.
 
-The +notes+ argument must be provided, its content will be the actual release notes for the submission.
+The +notes+ argument must be provided; its content will be the actual release notes for the submission.
 
 ----
 $ rake testflight notes='zomg!'
