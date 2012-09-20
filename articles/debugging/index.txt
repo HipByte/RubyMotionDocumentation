@@ -1,0 +1,271 @@
+Debugging RubyMotion applications
+=================================
+Laurent Sansonetti <lrz@hipbyte.com>
+
+This article covers how to debug RubyMotion projects using the builtin debugging facility. RubyMotion apps can be debugged either on the simulator or the device.
+
+At the time of this writing, the debugging experience in RubyMotion is still a work in progress, and this document might change any time to reflect the progresses that have been made in this regard.
+
+Synopsis
+--------
+
+The RubyMotion debugger is based on http://www.gnu.org/software/gdb/[GDB], the GNU Project Debugger.
+
+GDB is traditionally used to debug programs written in C-based languages, however, RubyMotion brings Ruby support to GDB, allowing it to connect and introspect RubyMotion processes.
+
+NOTE: The GDB support is at this point experimental and also quite low-level. Our goal is to build a higher-level, friendlier debugger on top of GDB that will provide a better experience for Ruby developers.
+
+NOTE: At the time of this writing, http://lldb.llvm.org/[LLDB] (Apple's new debugger) is not ready yet for prime time. We might however eventually switch to LLDB once it matures.
+
+This document aims at covering the main features that one might need in order to debug a RubyMotion app with GDB. This document is not a complete GDB manual. We highly recommend reading the official GDB documentation if an exhaustive guide is needed.
+
+Debugging symbols
+-----------------
+
+The RubyMotion compiler implements the http://www.dwarfstd.org[DWARF] debugging format metadata for the Ruby language. This allows external programs such as debuggers or profilers to retrieve source-level information about an existing RubyMotion application.
+
+The metadata is saved under a '.dSYM' bundle file at the same level as the '.app' bundle, in the 'build' directory of your project.
+
+Both +development+ and +release+ modes have debugging symbols, however, as the +release+ mode activates compilation optimizations, the debugging experience will be better under the +development+ mode. For example, in the +release+ mode, local variables might not be accessible in the debugger as they are optimized to fit into CPU registers.
+
+Starting the debugger
+---------------------
+
+In order to start the debugger, the +debug+ option can be set to any value on the appropriate rake target.
+
+When working with the +simulator+ rake task, the debugger will directly attach itself to the app and replace the interactive shell (REPL).
+
+----
+$ rake simulator debug=1
+----
+
+When working with the +device+ rake task, the build system will start the iOS debugging server on the device then remotely attach the debugger on your shell right after the application has been deployed on the device.
+
+----
+$ rake device debug=1
+----
+
+Entering commands before starting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default the application will run right after the debugger is started. Sometimes you might want to perform commands before the application starts.
+
+This can be done by setting the +no_continue+ option to any value. If set, the debugger will not continue to the application and will give you a chance to change the debugging environment (for example, setting a breakpoint). You can type the +continue+ command once you are ready to move on.
+
+----
+$ rake debug=1 no_continue=1
+[...]
+(gdb) break hello_view.rb:10
+Breakpoint 4 (hello_view.rb:10) pending.
+(gdb) continue
+Continuing.
+----
+
+Saving commands
+~~~~~~~~~~~~~~~
+
+It is also possible to save on disk commands you want the debugger to perform automatically when running your application.
+
+The debugger will honor the 'debugger_cmds' file in the root directory of your project. If this file exists, its content will be interpreted as a list of debugger commands separated by a newline character.
+
+----
+$ echo "break hello_view.rb:10" > debugger_cmds
+$ rake debug=1
+[...]
+----
+
+Managing breakpoints
+--------------------
+
+To set a breakpoint to a given location in the source code, use the +break+ command and pass the location where the debugger should break, using the +file:line+ notation.
+
+As an example, the following command sets a breakpoint on the 10th line of the 'hello_view.rb' file.
+
+----
+$ break hello_view.rb:10 
+----
+
+The +info breakpoints+ command can be used to list the breakpoints that have been set in the current debugger environment.
+
+----
+(gdb) info breakpoints 
+Num Type           Disp Enb Address    What
+1   breakpoint     keep y   0x0003b656 <rb_exc_raise+6>
+2   breakpoint     keep y   0x94c13827 <malloc_error_break+6>
+3   breakpoint     keep y   0x0000b1b0 in rb_scope__drawRect:__ at hello_view.rb:10
+	breakpoint already hit 1 time
+[...]
+----
+
+As you can see our breakpoint +hello_view.rb:10+ is right there and is enabled. The +enable+ and +disable+ commands can respectively enable or disable a given breakpoint using its number.
+
+Since our breakpoint is number 3 in the list, we can disable it like this:
+
+----
+(gdb) disable 3
+----
+
+Getting the backtrace
+---------------------
+
+Once you hit a breakpoint, it is often interesting to check out the execution backtrace, which will tell you where the method is called from.
+
+This can be done by using the +backtrace+ command.
+
+----
+Breakpoint 4, rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
+10	      bgcolor = UIColor.blackColor
+(gdb) backtrace
+#0  rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
+#1  0x0000b90f in __unnamed_9 ()
+#2  0x0054b4be in -[UIView(CALayerDelegate) drawLayer:inContext:] ()
+#3  0x01e15a3f in -[CALayer drawInContext:] ()
+#4  0x01e1596b in backing_callback ()
+#5  0x01d27697 in CABackingStoreUpdate_ ()
+#6  0x01e1583c in CA::Layer::display_ ()
+#7  0x01e159ba in -[CALayer _display] ()
+#8  0x01e152b6 in CA::Layer::display ()
+#9  0x01e15994 in -[CALayer display] ()
+#10 0x01e0a0e2 in CA::Layer::display_if_needed ()
+----
+
+Backtrace frames in your code can be identified with the +rb_scope__+ prefix and the file and line information. 
+
+Frames
+~~~~~~
+
+Here, the very first frame in the backtrace is the method defined in the breakpoint location: +drawRect:+. The other frames below the breakpoint are native iOS calls. As we can see, our +drawRect:+ method is called by the +UIView+ class, which makes sense.
+
+The +frame+ command lets you switch to a specific frame in the backtrace. By default you will be at the top frame (#0), but assuming you want to go down to frame #4 in order to inspect its context, you can type the followind command to do so.
+
+----
+(gdb) frame 4
+[...]
+----
+
+Obviously it mainly matters when you want to go down to a specific Ruby-defined location in the backtrace.
+
+Threads
+~~~~~~~
+
+The +backtrace+ command only returns the backtrace of the current thread. When dealing with a multithreaded program, you may sometimes want to print the backtrace of all running threads, for instance when you are debugging a race condition.
+
+The following command will print the backtrace of all the running threads in the terminal.
+
+----
+(gdb) thread apply all backtrace
+[...]
+----
+
+Similar to switching frames, the debugger will let you switch threads using the +thread+ command. This can be useful if you want to inspect a specific Ruby method frame in another running thread. The following command will switch the debugger prompt to the thread #4.
+
+----
+(gdb) thread 4
+[...]
+----
+
+Inspecting objects
+------------------
+
+After checking the backtrace, you may want to inspect the objects around. The debugger will let you print them using specialized commands.
+
+Local variables
+~~~~~~~~~~~~~~~
+
+We just hit our breakpoint defined in the +drawRect:(rect)+ method. As you can see from the breakpoint, we are inside a function that accepts two arguments: +self+ and +rect+. +rect+ is definitely our +CGRect+ argument, but what is +self+? 
+
+In RubyMotion, the +self+ argument is a pointer to the +self+ object exposed in Ruby, which represents a reference to the receiver of the method. In the debugger, +self+ is visible as the first argument of the method.
+
+We can inspect the values of both +self+ and +rect+ by using the +print-ruby-object+ command. This RubyMotion-defined command sends the +inspect+ message to the given object and returns its value. The command can also be called using the +pro+ shortcut which we will use as a convenience.
+
+----
+Breakpoint 4, rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
+10            bgcolor = UIColor.blackColor
+(gdb) print-ruby-object self
+#<HelloView:0x934d580>
+(gdb) pro rect
+#<CGRect origin=#<CGPoint x=0.0 y=0.0> size=#<CGSize width=320.0 height=480.0>>
+----
+
+The list of local variables can be printed using the +info locals+ command. The list will also include the addresses of each local variable.
+
+----
+(gdb) info locals
+bgcolor = (VALUE) 0x75a81d0
+red = (VALUE) 0x4
+green = (VALUE) 0x4
+blue = (VALUE) 0x4
+text = (VALUE) 0x75a9020
+font = (VALUE) 0x4
+----
+
+These local variables can also be individually inspected on the terminal by using the +pro+ command.
+
+----
+(gdb) pro bgcolor
+#<UICachedDeviceWhiteColor:0x75a81d0>
+(gdb) pro text   
+"Hello RubyMotion!"
+(gdb) pro font
+nil
+----
+
+Instance variables
+~~~~~~~~~~~~~~~~~~
+
+Instance variables of an object can be printed using the +print-ruby-ivar+ command, or its convenience shortcut +pri+. 
+
+If the command is given two arguments, the first one is the object on which the instance variable will be retrieved, and the second one must be a string representing the instance variable that you want to get. Make sure to include the +@+ character in the name.
+
+----
+(gdb) pri self "@touches"
+2
+----
+
+When called with only one argument, the command assumes that you want to retrieve the given instance variable from +self+.
+
+----
+(gdb) pri "@touches"
+2
+----
+
+Control flow
+------------
+
+The +next+ command will continue the execution of the program until the next source-level location. This is usually the very next line in the Ruby source code. You should see in the terminal the relevant source code line.
+
+----
+(gdb) next
+15	    UIBezierPath.bezierPathWithRect(frame).fill
+(gdb) next
+17	    font = UIFont.systemFontOfSize(24)
+(gdb) next
+18	    UIColor.whiteColor.set
+(gdb) next
+19	    text.drawAtPoint(CGPoint.new(10, 20), withFont:font)
+----
+
+The +continue+ command will continue the execution of the program until it reaches a breakpoint.
+
+----
+(gdb) continue
+[...]
+----
+
+When the program runs, you can always stop its execution and go back to the debugger prompt by typing the +control+c+ (+^C+) keyboard shortcut.
+
+----
+^C
+Program received signal SIGINT, Interrupt.
+0x910217d2 in mach_msg_trap ()
+(gdb)
+----
+
+If you want to quit the debugger, just type the +quit+ command and confirm that you want to exit. It will terminate the application and return you back to the shell prompt.
+
+----
+(gdb) quit
+The program is running.  Quit anyway (and detach it)? (y or n) y
+Detaching from process 91850.
+$
+----
