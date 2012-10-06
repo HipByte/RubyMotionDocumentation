@@ -50,7 +50,7 @@ For instance, if you want to require the +JSONKit+ Pod.
 Motion::Project::App.setup do |app|
   # ...
   app.pods do
-    dependency 'JSONKit'
+    pod 'JSONKit'
   end
 end
 ----
