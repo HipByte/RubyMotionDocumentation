@@ -392,4 +392,6 @@ Distribution
 
 The +rake archive+ task can be used to generate '.ipa' archives for both development and release modes. An '.ipa' archive is suitable for ad-hoc distribution and can also be used for a submission to the App Store.
 
+For creating an '.ipa' archive for the App Store, use +rake archive:distribution+
+
 The task requires a valid certificate and provisioning profile in order to codesign the app bundle.
