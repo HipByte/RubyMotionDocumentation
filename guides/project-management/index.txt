@@ -135,7 +135,7 @@ Here is a table summarizing project types and key/value objects.
 | +:headers_dir+ | Path to the directory that contains public headers files, declaring APIs that will be used by the RubyMotion project. The path should be relative to the path provided to +vendor_project+, for example +"include"+. The default value is the vendor project directory.
 |====
 
-Continuing our example from above, assuming our video player project wants to make use of the OAuth2Client 3rd-library library, a 'vendor' directory would be created and the OAuth2Client source code would be added there.
+Continuing our example from above, assuming our video player project wants to make use of the OAuth2Client 3rd-party library, a 'vendor' directory would be created and the OAuth2Client source code would be added there.
 
 ----
 $ cd AwesomeVideoPlayer
