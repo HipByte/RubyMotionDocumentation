@@ -136,7 +136,7 @@ Frames
 
 Here, the very first frame in the backtrace is the method defined in the breakpoint location: +drawRect:+. The other frames below the breakpoint are native iOS calls. As we can see, our +drawRect:+ method is called by the +UIView+ class, which makes sense.
 
-The +frame+ command lets you switch to a specific frame in the backtrace. By default you will be at the top frame (#0), but assuming you want to go down to frame #4 in order to inspect its context, you can type the followind command to do so.
+The +frame+ command lets you switch to a specific frame in the backtrace. By default you will be at the top frame (#0), but assuming you want to go down to frame #4 in order to inspect its context, you can type the following command to do so.
 
 ----
 (gdb) frame 4
