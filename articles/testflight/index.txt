@@ -43,6 +43,7 @@ You will need to change the 'Rakefile' of your project in order to set up the ge
 First, you need to require the gem. Add the following line at the beginning of the file, right after the other +require+ statements:
 
 ----
+require 'rubygems'
 require 'motion-testflight'
 ----
 

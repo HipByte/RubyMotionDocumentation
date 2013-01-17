@@ -39,6 +39,7 @@ Usage
 You will need to require the gem inside the 'Rakefile' of your project.
 
 ----
+require 'rubygems'
 require 'motion-cocoapods'
 ----
 
