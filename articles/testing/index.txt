@@ -35,6 +35,7 @@ The +spec+ Rake task can be used to run the test suite of a RubyMotion project.
 
 ----
 $ rake spec
+$ rake spec:device
 ----
 
 This command compiles a special version of your app that includes the spec framework, helpers and files and executes it in the simulator in the background.
