@@ -64,6 +64,14 @@ It is possible to customize the output format of +rake spec+ by specifying a val
 $ rake spec output=test_unit
 ----
 
+You can integrate Jenkins-CI with the Jenkins TAP plugin : https://wiki.jenkins-ci.org/display/JENKINS/TAP+Plugin
+
+You need to use the following command to generate the tap file.
+
+----
+$ rake spec output=tap > tap_output.txt
+----
+
 Basic Testing
 -------------
 
