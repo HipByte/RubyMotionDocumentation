@@ -23,7 +23,7 @@ The following table illustrates the anatomy of a project directory.
 
 [options="header,autowidth"]
 |=========================
-| File/Directory | Purpose 
+| File/Directory | Purpose
 | 'Rakefile' | This file contains the configuration of the project, as well as a default set of tasks. It can be edited to change the configuration or add new tasks.
 | '.gitignore' | This file contains file patterns that should be ignored by the source control management software (for instance, build files). This file is used by Git, but it can be ported to other SCMs.
 | 'app/' | This directory contains the Ruby code of the project. In a new project, a 'main.rb' file is created automatically.
@@ -57,7 +57,7 @@ The +rake config+ task will dump the project configuration. Each configuration v
 |+weak_frameworks+ | Similar to +frameworks+ but only links if it is available for the +deployment_target+. This correlates to XCodes +Optional+ setting and useful when a framework is not available for the projects +deployment_target+. Refer to http://developer.apple.com/library/ios/#documentation/miscellaneous/conceptual/iphoneostechoverview/iPhoneOSFrameworks/iPhoneOSFrameworks.html[iOS Frameworks] to verify the required framework. The default value is +[]+, an empty Array.
 | +libs+ | Library paths to link against, as an +Array+. It should contain paths to public, system libraries, for example +"/usr/lib/libz.dylib"+. The default value is +[]+, an empty array.
 |+build_dir+ | Path to the directory for build products, as a +String+. It must be relative to the project directory. The directory will be created by the build system if it does not exist yet. If it cannot be created, a temporary directory will be used instead. The default value is +"build"+.
-|+resources_dir+ | Directory for resources files, as a +String+. It must be relative to the project directory. The default value is +"resources"+.
+|+resources_dirs+ | Directories for resources files, as an +Array+ of +String+s. The default value is +["resources"]+.
 |+specs_dir+ | Directory for specification files, as a +String+. It must be relative to the project directory. The default value is +"spec"+.
 |+icons+ | List of names of resource files to use for icons, as an +Array+. For example, +["Icon.png", "Icon-72.png", "Icon@2x.png"]+. The files must conform to the http://developer.apple.com/library/ios/#documentation/userexperience/conceptual/mobilehig/IconsImages/IconsImages.html[HIG guidelines]. The default value is +[]+, an empty array.
 |+fonts+ | List of names of font files in the resources directory, as an +Array+. For example, +["Inconsolata.otf"]+. The fonts will then be properly taken into account when generating the application. The default value is the list of all '.ttf' and '.otf' files in the resources directory. It is recommended to keep the default value.
@@ -146,7 +146,7 @@ $ ls vendor
 OAuth2Client
 ----
 
-Then, the 'Rakefile' can be modified as such. 
+Then, the 'Rakefile' can be modified as such.
 
 ----
 Motion::Project::App.setup do |app|
@@ -224,7 +224,7 @@ The build system will detect the following Xcode resource files in the 'resource
 
 [options="header,autowidth"]
 |=========================
-| Source Extension | Compiled Extension | Description 
+| Source Extension | Compiled Extension | Description
 | '.xib' | '.nib' | Interface Builder files.
 | '.storyboard' |  '.storyboardc' | Storyboard files.
 | '.xcdatamodeld' | '.momd' | CoreData model files.
@@ -320,7 +320,7 @@ Testing
 -------
 
 RubyMotion has built-in http://en.wikipedia.org/wiki/Behavior_Driven_Development[Behavior-Driven Development] functionality that you can use to cover the specifications of an application. RubyMotion uses a flavor of the http://github.com/alloy/MacBacon[Bacon] framework slightly modified to integrate better with the iOS system.
- 
+
 Specification files are written in the 'spec' directory.
 
 The +rake spec+ task will build a special version of the project that will execute all specification files right after the application launches. A summary will then be printed on the standard output terminal, and the application will exit.
@@ -330,7 +330,7 @@ Note: +rake spec+ currently only works with the simulator.
 Specification files have full access to the iOS SDK as well as the application classes. Here is a spec that makes sure the application has one active window.
 
 ----
-$ cat spec/main_spec.rb 
+$ cat spec/main_spec.rb
 describe "My Awesome App" do
   it "has a window" do
     app = UIApplication.sharedApplication
@@ -360,7 +360,7 @@ Development vs Release
 
 A RubyMotion project can be built for development or release. A project is built for development when you run it in the simulator, or push it to your development device. A project is built for release when you're generating an archive for an App Store submission.
 
-Currently, the only difference between a RubyMotion app built for release and one built for development is that all symbols are stripped from the main executable. This process removes about 1MB of data from the app bundle, but at the same time makes debugging more difficult, which is why it's not applied in development. 
+Currently, the only difference between a RubyMotion app built for release and one built for development is that all symbols are stripped from the main executable. This process removes about 1MB of data from the app bundle, but at the same time makes debugging more difficult, which is why it's not applied in development.
 
 Sometimes, you want to apply different settings in the 'Rakefile' if the project builds for release. This can be done by using the +development+ and +release+ methods on the configuration object. These methods will yield the given block for the specified build mode.
 
