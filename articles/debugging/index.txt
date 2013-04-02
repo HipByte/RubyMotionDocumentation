@@ -68,6 +68,8 @@ It is also possible to save on disk commands you want the debugger to perform au
 
 The debugger will honor the 'debugger_cmds' file in the root directory of your project. If this file exists, its content will be interpreted as a list of debugger commands separated by a newline character.
 
+Only use the name of the file not the full path : hello_view.rb:10 and not app/hello_view.rb:10.
+
 ----
 $ echo "break hello_view.rb:10" > debugger_cmds
 $ rake debug=1
