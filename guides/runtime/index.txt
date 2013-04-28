@@ -128,6 +128,34 @@ As an example, the +setHidden:+ and +isHidden+ methods of +UIView+ can be called
 view.hidden = true unless view.hidden?
 ----
 
+Super
+~~~~~
+
+In Objective-C, +super+ sends a message to the superclass of the current class, invoking a specific method.  In the example below, +super+ would send the +play+ message to +MediaController+ with +song+ as the argument.
+
+----
+@interface VideoController : MediaController
+@end
+
+@implementation VideoController
+- (void)play:(NSString *)song {
+  [super play:song];
+  // Customize here...
+}
+@end
+----
+
+In Ruby Motion, +super+ sends a message to the superclass of the current class, http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632270[invoking a method of the same name] and http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632229[passing it the same arguments].
+
+----
+class VideoController < MediaController
+  def play(song)
+    super
+    # Customize here...
+  end
+end
+----
+
 Builtin Classes
 ---------------
 
