@@ -15,7 +15,7 @@ Object Model
 
 The object model of RubyMotion is based on http://en.wikipedia.org/wiki/Objective-C[Objective-C], the underlying language runtime of the iOS SDK. Objective-C is an object-oriented flavor of C that has been, like Ruby, heavily influenced by the http://en.wikipedia.org/wiki/Smalltalk[Smalltalk] language.
 
-Sharing a common ancestor, the object models of Ruby and Objective-C are conceptually similar. For instance, both languages have the notion of open classes, single inheritance and single dynamic message dispatch. 
+Sharing a common ancestor, the object models of Ruby and Objective-C are conceptually similar. For instance, both languages have the notion of open classes, single inheritance and single dynamic message dispatch.
 
 RubyMotion implements the Ruby object model by using the http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/ObjCRuntimeRef/Reference/reference.html[Objective-C runtime], the library that powers the Objective-C language and indirectly, the iOS SDK APIs.
 
@@ -69,9 +69,9 @@ Objective-C Interfaces
 
 As Objective-C is the main language used to describe the iOS SDK, it is necessary to understand how to read Objective-C interfaces and how to use them from Ruby.
 
-Objective-C interfaces can be found in Apple's iOS API reference and also in the iOS framework header (+.h+) files. 
+Objective-C interfaces can be found in Apple's iOS API reference and also in the iOS framework header (+.h+) files.
 
-An Objective-C interface starts with either the minus or plus character, which is used to respectively declare instance or class methods. 
+An Objective-C interface starts with either the minus or plus character, which is used to respectively declare instance or class methods.
 
 For example, the following interface declares the +foo+ instance method on the +Foo+ class.
 
@@ -145,13 +145,62 @@ In Objective-C, +super+ sends a message to the superclass of the current class, 
 @end
 ----
 
-In Ruby Motion, +super+ sends a message to the superclass of the current class, http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632270[invoking a method of the same name] and http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632229[passing it the same arguments].
+In Ruby (and by extension, RubyMotion), +super+ sends a message to the superclass of the current class, http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632270[invoking a method of the same name] and http://stackoverflow.com/questions/4632224/super-keyword-in-ruby#answer-4632229[passing it the same arguments].
 
 ----
 class VideoController < MediaController
   def play(song)
     super
     # Customize here...
+  end
+end
+----
+
+In Objective-C it is possible to call a method on the super class and bypass the method locally. This is especially convenient when defining +init+ methods.
+
+----
+@interface CustomView : UIView
+@property (copy) NSString *text;
+@end
+
+@implementation CustomView
+- (id) initWithFrame:(CGRect)frame {
+  [super initWithFrame:frame];
+  self.text = @"";
+  return self;
+}
+- (id) initWithText:(NSString*)text {
+  UIFont *font = [UIFont systemFontOfSize:12];
+  CGRect size = [text sizeWithFont:font];
+  // skip local initializer
+  [super initWithFrame:{{0, 0}, size}];
+  self.text = text;
+  return self;
+}
+----
+
+This is a contrived example because in this case it would be fine to call `initWithFrame`.  But there are cases where you do not want to call your local method, but you need to call the method on super.
+
+This is not easily accomplished in Ruby (see http://stackoverflow.com/questions/2564391/how-do-i-call-a-super-class-method[How do I call a super class method] on stack overflow).  In Ruby you need to +alias+ the parent method and call that method instead.
+
+----
+class CustomView < UIView
+  alias :'super_initWithFrame:' :'initWithFrame:'
+  # if your method takes multiple arguments, you can alias that as well
+  # alias :'renameWithArg1:arg2' :'methodWithArg1:arg2'
+
+  def initWithFrame(frame)
+    super.tap do
+      @text = ''
+    end
+  end
+
+  def initWithText(text)
+    font = UIFont.systemFontOfSize(12)
+    size = text.sizeWithFont(font)
+    super_initWithFrame([[0, 0], size]).tap do
+      @text = text
+    end
   end
 end
 ----
@@ -226,7 +275,7 @@ Objective-C is a superset of the C language. Objective-C methods can therefore a
 
 Also, while Objective-C is the main programming language used in the iOS SDK, some frameworks are only available in C APIs.
 
-RubyMotion comes with an interface that allows Ruby to deal with the C part of APIs. 
+RubyMotion comes with an interface that allows Ruby to deal with the C part of APIs.
 
 Basic Types
 ~~~~~~~~~~~
@@ -240,7 +289,7 @@ An example are the following methods of +NSFileHandle+, which both respectively 
 - (int)fileDescriptor;
 ----
 
-Basic C types cannot be created from Ruby directly, but are automatically converted from and to equivalent Ruby types. 
+Basic C types cannot be created from Ruby directly, but are automatically converted from and to equivalent Ruby types.
 
 The following piece of code uses the two +NSFileHandle+ methods described above. The first one, +initWithFileDescriptor:+, is called by passing a +Fixnum+. The second one, +fileDescriptor+, is called and a +Fixnum+ is returned back to Ruby.
 
@@ -365,7 +414,7 @@ unless data.writeToFile(path, options: mask, error: error_ptr)
 end
 ----
 
-In the case above, we need a pointer to an object. +Pointer.new+ can also be used to create pointers to various types, including the basic C types, but also structures. 
+In the case above, we need a pointer to an object. +Pointer.new+ can also be used to create pointers to various types, including the basic C types, but also structures.
 
 +Pointer.new+ accepts either a +String+, which should be one of the http://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html[Objective-C runtime types] or a +Symbol+, which should be a shortcut. We recommend the use of shortcuts.
 
