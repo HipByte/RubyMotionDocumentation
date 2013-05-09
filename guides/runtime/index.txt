@@ -6,14 +6,14 @@ The RubyMotion runtime implements the Ruby language functionality required durin
 
 Although similar in appearance, the RubyMotion runtime has a completely different implementation than http://www.ruby-lang.org/en/[CRuby], the mainstream implementation (which is also called MRI, or simply Ruby). We will cover the main differences in the following sections.
 
-The key feature of the RubyMotion runtime is its tight integration with iOS, which makes it suitable for use on power efficient devices.
+The key feature of the RubyMotion runtime is its tight integration with iOS and OSX, which makes it suitable for use on power efficient devices as well as for writing performance-intensive code.
 
 RubyMotion follows the Ruby 1.9 language specifications.
 
 Object Model
 ------------
 
-The object model of RubyMotion is based on http://en.wikipedia.org/wiki/Objective-C[Objective-C], the underlying language runtime of the iOS SDK. Objective-C is an object-oriented flavor of C that has been, like Ruby, heavily influenced by the http://en.wikipedia.org/wiki/Smalltalk[Smalltalk] language.
+The object model of RubyMotion is based on http://en.wikipedia.org/wiki/Objective-C[Objective-C], the underlying language runtime of the iOS and OSX SDK. Objective-C is an object-oriented flavor of C that has been, like Ruby, heavily influenced by the http://en.wikipedia.org/wiki/Smalltalk[Smalltalk] language.
 
 Sharing a common ancestor, the object models of Ruby and Objective-C are conceptually similar. For instance, both languages have the notion of open classes, single inheritance and single dynamic message dispatch.
 
@@ -208,7 +208,7 @@ end
 Builtin Classes
 ---------------
 
-Some of the built-in classes of RubyMotion are based on the http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/ObjC_classic/\_index.html[Foundation framework], the base layer of iOS.
+Some of the built-in classes of RubyMotion are based on the http://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/ObjC_classic/\_index.html[Foundation framework], the base layer of iOS and OSX.
 
 The Foundation framework is an Objective-C framework, but due to the fact that RubyMotion is based on the Objective-C runtime, the classes that it defines can be naturally re-used in RubyMotion.
 
@@ -360,7 +360,7 @@ end
 view = UIView.alloc.initWithFrame(CGRectNull)
 ----
 
-IMPORTANT: Some enumerations or constants defined in the iOS SDK may start with a lower-case letter, like +kCLLocationAccuracyBest+ (starting with +k+). Because Ruby constants must always start with a capital letter, their names must be corrected by changing the case of the first letter, becoming +KCLLocationAccuracyBest+ (starting with +K+) in Ruby.
+IMPORTANT: Some enumerations or constants defined in the iOS and OSX SDK may start with a lower-case letter, like +kCLLocationAccuracyBest+ (starting with +k+). Because Ruby constants must always start with a capital letter, their names must be corrected by changing the case of the first letter, becoming +KCLLocationAccuracyBest+ (starting with +K+) in Ruby.
 
 ----
 locationManager.desiredAccuracy = kCLLocationAccuracyBest # NameError: undefined local variable or method
@@ -379,7 +379,7 @@ pt = CGPointMake(100, 200)
 'Hello'.drawAtPoint(pt, withFont: font)
 ----
 
-IMPORTANT: Most functions in the iOS SDK start by a capital letter. For those who accept no argument, it is important to explicitely use parentheses when calling them, in order to avoid the expression to be evaluated as a constant lookup.
+IMPORTANT: Most functions in the iOS and OSX SDK start by a capital letter. For those who accept no argument, it is important to explicitely use parentheses when calling them, in order to avoid the expression to be evaluated as a constant lookup.
 
 ----
 NSHomeDirectory   # NameError: uninitialized constant NSHomeDirectory
@@ -391,7 +391,7 @@ Pointers
 
 Pointers are a very basic data type of the C language. Conceptually, a pointer is a memory address that can point to an object.
 
-In the iOS SDK, pointers are typically used as arguments to return objects by reference. As an example, the +error+ argument of this +NSData+ method expects a pointer that will be set to an +NSError+ object in case of failure.
+In the iOS and OSX SDK, pointers are typically used as arguments to return objects by reference. As an example, the +error+ argument of this +NSData+ method expects a pointer that will be set to an +NSError+ object in case of failure.
 
 ----
 - (BOOL)writeToFile:(NSString *)path options:(NSDataWritingOptions)mask error:(NSError **)errorPtr
@@ -451,7 +451,7 @@ Function Pointers and Blocks
 
 C or Objective-C APIs accepting C function pointers or C blocks can be called by RubyMotion, by passing a +Proc+ object instead.
 
-Functions pointers are pretty rare in the iOS SDK, but C blocks are common. C blocks are an extension of the C language defined by Apple. The caret (+^+) character is used to define C blocks.
+Functions pointers are pretty rare in the iOS and OSX SDK, but C blocks are common. C blocks are an extension of the C language defined by Apple. The caret (+^+) character is used to define C blocks.
 
 As an example, let's consider the +addObserverForName:object:queue:usingBlock:+ method of +NSNotificationCenter+, which accepts a C block as its last argument.
 
@@ -503,9 +503,43 @@ RubyMotion implements a form of garbage collection called reference counting. An
 
 RubyMotion's memory management system is designed to simplify the development process. Unlike traditional Objective-C programming, object references are automatically created and destroyed by the system. It is very similar to Objective-C's ARC, in design, but it is implemented differently.
 
-CAUTION: Object cycles, when two or more objects refer to each other, are currently not handled by the runtime, but will be in future releases.
+NOTE: Object collections are triggered by the system and are not deterministic. RubyMotion is based on the existing autorelease pool infrastructure. The system creates and destroys autorelease pools for you, for instance, within the event run loop.
 
-NOTE: Object collections are triggered by the system and are not deterministic. RubyMotion is based on the existing autorelease pool infrastructure. iOS creates and destroys autorelease pools for you, for instance, within the event run loop.
+Weak References
+~~~~~~~~~~~~~~~
+
+Object cycles, when two or more objects refer to each other, are currently not handled by the runtime. It is therefore important to explicitely create weak references in this case, to avoid the referred objects to leak memory.
+
+RubyMotion implements the +WeakRef+ class, similar to the one in the Ruby's +weak_ref+ standard library. Weak references can be created using +WeakRef.new(obj)+, and the passed object will not be retained. All messages sent to the +WeakRef+ object will be forwarded at the dispatcher level to the passed object.
+
+Here is an exemple implementing the delegate pattern using a weak reference.
+
+----
+class MyView
+  def initialize(delegate)
+    @delegate = WeakRef.new(delegate)
+  end
+
+  def do_something
+    # ...
+    @delegate.did_something
+  end
+end
+
+class MyController
+  def initialize
+    @view = MyView.new(self)
+  end
+
+  def did_something
+    # ...
+  end
+end
+----
+
+Without a weak reference here, both +MyView+ and +MyController+ objects would leak memory.
+
+NOTE: We expect the RubyMotion runtime to be able to deal with cyclic references at some point. Once it happens, the +WeakRef+ class will be replaced with a no-operation.
 
 Objective-C  and CoreFoundation Objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -533,6 +567,8 @@ Immediate Types
 The +Fixnum+ and +Float+ types in RubyMotion are immediates; they don't use memory resources to be created. The runtime uses a technique called http://en.wikipedia.org/wiki/Tagged_pointer[tagged pointers] to implement this.
 
 The ability to use these types without affecting the memory usage is important as a sizable part of a real-world app is spent in control drawing, which can make intensive use of arithmetic algorithms.
+
+INFO: Since iOS is using a 32-bit architecture, immediate types are encoded on a 30-bit pointer (we need 2 bits for type information). On OSX, immediate types will be encoded on a 62-bit pointer when the program runs on recent Mac computers, which are powered by a 64-bit architecture.
 
 Concurrency
 -----------
