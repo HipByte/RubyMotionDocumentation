@@ -8,11 +8,11 @@ Thank you for purchasing RubyMotion. This guide will help you get started with t
 Overview
 --------
 
-http://www.rubymotion.com[RubyMotion] is a toolchain that permits the development of iOS and OSX applications using the Ruby programming language.
+http://www.rubymotion.com[RubyMotion] is a toolchain that permits the development of iOS and OS X applications using the Ruby programming language.
 
-http://www.apple.com/ios[iOS] is Apple's mobile operating system, powering a variety of devices such as the iPhone, iPod touch and iPad. http://www.apple.com/osx[OSX] is Apple's desktop operating system, powering Mac computers such as the iMac or the MacBook Air.
+http://www.apple.com/ios[iOS] is Apple's mobile operating system, powering a variety of devices such as the iPhone, iPod touch and iPad. http://www.apple.com/osx[OS X] is Apple's desktop operating system, powering Mac computers such as the iMac or the MacBook Air.
 
-Developers can write applications for iOS and OSX and submit them to the App Store, Apple's application distribution system.
+Developers can write applications for iOS and OS X and submit them to the App Store, Apple's application distribution system.
 
 Conceptually, RubyMotion is a combination of two major components:
 
@@ -24,9 +24,9 @@ RubyMotion installs itself into '/Library/RubyMotion'. A symbolic link to the co
 Prerequisites
 -------------
 
-RubyMotion requires a Mac running OSX 10.6 or higher. OSX 10.7 Lion however is highly recommended.
+RubyMotion requires a Mac running OS X 10.6 or higher. OS X 10.7 Lion however is highly recommended.
 
-You will need to install the iOS and OSX SDK on your machine. These days the SDKs comes with Xcode. Xcode can be downloaded and installed for free using the App Store application.
+You will need to install the iOS and OS X SDK on your machine. These days the SDKs comes with Xcode. Xcode can be downloaded and installed for free using the App Store application.
 
 NOTE: Xcode is Apple's IDE. You do not need to use it when programming with RubyMotion, you can keep using your favorite text editor.
 
@@ -160,10 +160,10 @@ This should install the Hello app on your device. You can now pick it up and run
 
 Congratulations, you successfully created your first RubyMotion program. That wasn’t too hard, was it?
 
-OSX
+OS X
 ~~~
 
-Now, let's try to write our first RubyMotion OSX program. It will also be Hello World.
+Now, let's try to write our first RubyMotion OS X program. It will also be Hello World.
 
 Open your terminal and go to a place where you would like this first project to be created, then type the following command.
 
@@ -171,9 +171,9 @@ Open your terminal and go to a place where you would like this first project to 
 $ motion create --template=osx Hello
 ----
 
-NOTE: Please note that we are passing the +--template=osx+ option to the +motion+ command here. By default, +motion create+ will create iOS projects. Since we want to create an OSX project, we need to select the OSX project template.
+NOTE: Please note that we are passing the +--template=osx+ option to the +motion+ command here. By default, +motion create+ will create iOS projects. Since we want to create an OS X project, we need to select the OS X project template.
 
-This command will create a RubyMotion OSX project in a new directory named Hello. If this directory already exists or cannot be created, the command will fail.
+This command will create a RubyMotion OS X project in a new directory named Hello. If this directory already exists or cannot be created, the command will fail.
 
 Let's have a look inside.
 
@@ -225,11 +225,11 @@ If you run the +rake+ command again from the terminal you should be able to see 
 
 image:/developer-center/guides/getting-started/images/hello-osx.png["Hello World"]
 
-Congratulations, you successfully created your first RubyMotion iOS and OSX programs. That wasn’t too hard, was it?
+Congratulations, you successfully created your first RubyMotion iOS and OS X programs. That wasn’t too hard, was it?
 
 And Now?
 --------
 
-You will find sample code for both iOS and OSX in the https://github.com/HipByte/RubyMotionSamples[Sample Code Repository] on GitHub. Each of the sub-folders contains a RubyMotion project as introduced above. You can type +rake+ in each directory to build and run them and check their source code by reading the files in the 'app' directory.
+You will find sample code for both iOS and OS X in the https://github.com/HipByte/RubyMotionSamples[Sample Code Repository] on GitHub. Each of the sub-folders contains a RubyMotion project as introduced above. You can type +rake+ in each directory to build and run them and check their source code by reading the files in the 'app' directory.
 
 Make sure to check the link:/developer-center[Developer Center] for more resources, such as guides, articles and screencasts.
