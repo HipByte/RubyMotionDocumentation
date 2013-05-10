@@ -53,9 +53,10 @@ Now that the gem is loaded, it's time to configure it. Inside your application c
 app.testflight.sdk = 'vendor/TestFlight'
 app.testflight.api_token = '<insert your API token here>'
 app.testflight.team_token = '<insert your team token here>'
+app.testflight.app_token = '<insert your app token here>' *(TestFlight SDK 1.2 and greater)*
 ----
 
-You can retrieve the values for +api_token+ and +team_token+ from your TestFlight account page.
+You can retrieve the values for +api_token+ and +team_token+ from your TestFlight account page, and the value for your +app_token+ from your App page.
 
 Optionally, you can use the +distribution_lists+ key if you do want to set up a distribution list for your submissions.
 
