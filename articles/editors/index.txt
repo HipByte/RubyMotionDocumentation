@@ -41,5 +41,5 @@ Emacs
 
 http://www.gnu.org/software/emacs/[Emacs] is a popular text editor. Emacs ships in OS X.
 
-It is possible to configure RubyMotion to emit a +tags+ file readable by Emacs by following the instructions in http://stirredbits.com/blog/2012/05/06/rubymotion-completion-with-emacs/[this article].
+https://github.com/ainame/motion-mode[motion-mode] is a plugin that provides code completion and an integration with the build system. It is developed by https://github.com/ainame[Satoshi Namai].
 
