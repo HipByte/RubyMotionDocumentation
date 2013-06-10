@@ -113,6 +113,7 @@ OS X Options
 | Variable | Discussion
 |+icon+ | The name of the icon resource file to use as the application icon, as a +String+. For example, +"Icon.png"+. The default value is +''+, an empty string.
 |+copyright+| The human-readable copyright that will be used in the application's property file, as a +String+. The default value is +"Copyright (c) CURRENT_DATE CURRENT_USER. All Right Reserved."+.
+|+embedded_frameworks+| List of 3rd-party frameworks to embed in the application bundle, as an +Array+ of +String+ objects representing filesystem paths. For example, +["../MyFramework/framework"]+. The default value is an empty array.
 |====
 
 Providing Custom Values
@@ -159,8 +160,8 @@ end
 
 After this change, the build system will compile 'foo.rb' before 'bar.rb'.
 
-Using 3rd-Party Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Vendoring 3rd-Party Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The iOS and OS X SDK has a significant amount of functionality built-in that you can use in your RubyMotion project. However, sometimes you will have to use a 3rd-party library that provides a feature missing from the system.
 
@@ -203,6 +204,24 @@ Motion::Project::App.setup do |app|
   app.frameworks << 'Security' # OAuth2Client depends on Security.framework
 end
 ----
+
+Embedded Frameworks
+^^^^^^^^^^^^^^^^^^^
+
+NOTE: OS X only.
+
+OS X applications can embed 3rd-party frameworks inside their bundle directory. This can be used as an alternative to vendoring static libraries, as described above.
+
+To embed a 3rd-party framework in your app, you can use the +app.embedded_frameworks+ variable in the 'Rakefile'.
+
+----
+Motion::Project::App.setup do |app|
+  # ...
+  app.embedded_frameworks << '../MyFramework.framework'
+end
+----
+
+Embedded frameworks are copied inside the 'Contents/Frameworks' directory of the application bundle. The application binary executable will also be reconfigured to have a relative link path to the framework. 
 
 Entitlements
 ~~~~~~~~~~~~
@@ -316,6 +335,19 @@ $ rake
 ----
 
 In an iOS project, the application will run in the iOS simulator. The default +rake+ task is a shortcut to +rake simulator+.
+
+In an OS X project, the application will run natively. The default +rake+ task is a shortcut to +rake run+.
+
+Passing Arguments
+~~~~~~~~~~~~~~~~~
+
+During development, you may have to pass command-line arguments when launching the application.
+
+The +rake+ task honors the +args+ environment variable, which can be used to provide arguments. As an example, to enable CoreData SQL debug:
+
+----
+$ rake args="-com.apple.CoreData.SQLDebug 1"
+----
 
 Interactive Console
 ~~~~~~~~~~~~~~~~~~~
@@ -459,3 +491,24 @@ On iOS projects, archive files have the '.ipa' file extension. On OS X projects,
 For creating an archive for the App Store, use the +rake archive:distribution+ task.
 
 The task requires a valid certificate and provisioning profile in order to codesign the app bundle.
+
+Manifest File
+^^^^^^^^^^^^^
+
+iOS projects can have a 'manifest.plist' file generated during +rake archive+. This file can be used to implement over-the-air ad-hoc distribution
+
+To enable the generation of this file, the +app.manifest_assets+ variable, which defaults to an empty +Array+, has to include at least one +Hash+ object describing an asset. Each +Hash+ has to provide values for the +kind+ and +url+ keys. Values for the +kind+ key can be +"software-package"+, +"display-image"+ and +"full-size-image"+.  
+
+The following snippet describes 2 manifest assets, a pointer to the application archive and a pointer to an icon image describing the application.
+
+----
+Motion::Project::App.setup do |app|
+  # ...
+  app.manifest_assets << { :kind => 'software-package',
+                           :url => 'http://mycompany.com/files/myapp.ipa' }
+  app.manifest_assets << { :kind => 'display-image',
+                           :url => 'http://mycompany.com/files/myapp.jpg' }
+end
+----
+
+At the time of this writing, Apple doesn't provide documentation regarding the format of the properly list file, so you will have to search online to know more.
