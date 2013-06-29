@@ -1,7 +1,7 @@
 Writing Tests for RubyMotion Apps
 =================================
 
-This document describes how to write functional tests for an existing RubyMotion app. Tests provide a set of specifications an application is supposed to conform to and can be used to catch regressions after an unfortunate change in the code. 
+This document describes how to write functional tests for an existing RubyMotion app. Tests provide a set of specifications an application is supposed to conform to and can be used to catch regressions after an unfortunate change in the code.
 
 Getting Started
 ---------------
@@ -105,7 +105,16 @@ This will, before each specification, instantiate a new window and a new instanc
 controller class. These are available in your specifications as `window` and `controller`.
 
 TIP: If you need to perform custom instantiation of either the window or controller then you can
-     do so from a `before` filter __before__ calling `tests`.
+     do so from a `before` filter __before__ calling `tests`.  It is common, though, that you will
+     need to perform initialization on the controller even earlier than *that*, in which case
+     you should pass a block to the `tests` method:
+
+----
+describe "The 'taking over the world' view" do
+  tests TakingOverTheWorldViewController do |controller|
+    controller.initial_data = {}
+  end
+----
 
 Storyboards
 ^^^^^^^^^^^
