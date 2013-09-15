@@ -379,7 +379,7 @@ pt = CGPointMake(100, 200)
 'Hello'.drawAtPoint(pt, withFont: font)
 ----
 
-IMPORTANT: Most functions in the iOS and OS X SDK start by a capital letter. For those who accept no argument, it is important to explicitely use parentheses when calling them, in order to avoid the expression to be evaluated as a constant lookup.
+IMPORTANT: Most functions in the iOS and OS X SDK start by a capital letter. For those who accept no argument, it is important to explicitly use parentheses when calling them, in order to avoid the expression to be evaluated as a constant lookup.
 
 ----
 NSHomeDirectory   # NameError: uninitialized constant NSHomeDirectory
@@ -508,11 +508,11 @@ NOTE: Object collections are triggered by the system and are not deterministic. 
 Weak References
 ~~~~~~~~~~~~~~~
 
-Object cycles, when two or more objects refer to each other, are currently not handled by the runtime. It is therefore important to explicitely create weak references in this case, to avoid the referred objects to leak memory.
+Object cycles, when two or more objects refer to each other, are currently not handled by the runtime. It is therefore important to explicitly create weak references in this case, to avoid the referred objects to leak memory.
 
 RubyMotion implements the +WeakRef+ class, similar to the one in the Ruby's +weak_ref+ standard library. Weak references can be created using +WeakRef.new(obj)+, and the passed object will not be retained. All messages sent to the +WeakRef+ object will be forwarded at the dispatcher level to the passed object.
 
-Here is an exemple implementing the delegate pattern using a weak reference.
+Here is an example implementing the delegate pattern using a weak reference.
 
 ----
 class MyView

@@ -225,7 +225,7 @@ These methods allow you to retrieve views. They traverse down through the view h
 from the current `window`.
 
 If no view matches, then they will keep re-trying it during the `timeout`, which defaults to three
-seconds. This means you don’t need to worry about wether or not the view you’re looking for is
+seconds. This means you don’t need to worry about whether or not the view you’re looking for is
 still being loaded or animated.
 
 Finally, if the timeout passes and **no** view matches an exception will be raised.
