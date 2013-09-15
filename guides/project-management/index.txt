@@ -304,7 +304,7 @@ The compiled files will be removed by 'rake clean'.
 Parallel Compilation
 ~~~~~~~~~~~~~~~~~~~~
 
-The compilation of Ruby source files into machine code takes a non-negligeable amount of time.
+The compilation of Ruby source files into machine code takes a non-negligible amount of time.
 
 If the machine used to build the project runs a multicore processor, which is very likely these days, the build system will try to spread the compilation tasks in parallel. This can be very useful when building a project that contains a significant number of files.
 
