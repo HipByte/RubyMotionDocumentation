@@ -105,15 +105,42 @@ This will, before each specification, instantiate a new window and a new instanc
 controller class. These are available in your specifications as `window` and `controller`.
 
 TIP: If you need to perform custom instantiation of either the window or controller then you can
-     do so from a `before` filter __before__ calling `tests`.  It is common, though, that you will
-     need to perform initialization on the controller even earlier than *that*, in which case
-     you should pass a block to the `tests` method:
+     do so from a `before` filter __before__ calling `tests`.  The same applies to `after` filters.
+     If you want those to be able to have a reference to the controller instance used during the
+     test, then you will have to register your `after` filter __before__ the `tests` method’s
+     `after` filter removes the window and controller instances. For example:
 
 ----
-describe "The 'taking over the world' view" do
-  tests TakingOverTheWorldViewController do |controller|
-    controller.initial_data = {}
+describe "Before and after filter order illustrated" do
+  # This `before` filter is defined __before__ the one of the `tests` method, so at this point the
+  # window instance is not yet created and you can perform controller initialization.  It is
+  # important to note, though, that once you call `window` it will be created on-demand.
+  before do
+    controller.dataThatNeedsToBeConfiguredBeforeAssigningToWindow = ['TableView Row 1', 'TableView Row 2']
   end
+
+  # This `after` filter is defined __before__ the one of the `tests` method, so at this point the
+  # window and controller instances are not yet cleaned up and set to `nil`.
+  after do
+    controller.performCustomPostTestWork
+    window.performCustomPostTestWork
+  end
+
+  tests TakingOverTheWorldViewController
+  # Calling `tests` registers a `before` and an `after` filter that do something like the following:
+  #
+  #  before do
+  #    createWindowAndControllerIfNotCreatedYet
+  #  end
+  #
+  #  after do
+  #    cleanUpWindowAndController
+  #  end
+
+  it "performs tests" do
+    # ...
+  end
+end
 ----
 
 Storyboards
