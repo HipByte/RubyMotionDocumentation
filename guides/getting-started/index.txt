@@ -24,7 +24,7 @@ RubyMotion installs itself into '/Library/RubyMotion'. A symbolic link to the co
 Prerequisites
 -------------
 
-RubyMotion requires a 64-bit Mac running OS X 10.6 or higher. OS X 10.8 Mountain Lion however is highly recommended.
+RubyMotion requires a 64-bit Mac running OS X 10.8.4 or higher. OS X 10.9 Mavericks is however recommended.
 
 You will need to install the iOS and OS X SDK on your machine. These days the SDKs comes with Xcode. Xcode can be downloaded and installed for free using the App Store application.
 
