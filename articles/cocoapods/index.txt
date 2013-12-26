@@ -7,31 +7,29 @@ In this article we will cover how you can integrate the http://cocoapods.org[Coc
 Synopsis
 --------
 
-CocoaPods is the missing dependency manager for Objective-C projects. It is similar to RubyGems but for Objective-C dependencies.
+CocoaPods is the dependency manager for Objective-C projects. It is similar to RubyGems but for Objective-C dependencies.
 
-Dependencies in CocoaPods are called Pods. You can get the list of Pods available from the http://github.com/CocoaPods/Specs[CocoaPods/Specs] GitHub repository.
+Dependencies in CocoaPods are called Pods (analgous to Ruby Gems). You can get the list of Pods available from the http://github.com/CocoaPods/Specs[CocoaPods/Specs] GitHub repository.
 
-CocoaPods was originally designed to be integrated in Objective-C Xcode projects, but we worked with the awesome CocoaPods author to make it possible to be used in RubyMotion projects.
+CocoaPods were originally designed to be integrated in Objective-C Xcode projects, but we worked with the awesome CocoaPods author to make it possible to be used in RubyMotion projects.
 
 You can check the http://cocoapods.org website to get more information about CocoaPods.
 
-Installation
+Setup
 ------------
 
-First, you will need to install and setup CocoaPods, unless you already have.
+Firstly, you will need to implement the gem.  This can be done systemwide with command line, or bundler.  The code lives in the http://github.com/HipByte/motion-cocoapods[HipByte/motion-cocoapods] GitHub repository.
 
+Command Line:
 ----
-$ sudo gem install cocoapods
-$ pod setup
-----
-
-The RubyMotion CocoaPods integration also comes as a gem. 
-
-----
-$ sudo gem install motion-cocoapods
+$ [sudo] gem install cocoapods
 ----
 
-The code lives in the http://github.com/HipByte/motion-cocoapods[HipByte/motion-cocoapods] GitHub repository.
+Bundler (in your Gemfile)
+----
+gem 'motion-cocoapods'
+----
+
 
 Usage
 -----
@@ -56,7 +54,18 @@ Motion::Project::App.setup do |app|
 end
 ----
 
-That's all you have to do.
+You can view and example of a pod being used in https://github.com/HipByte/RubyMotionSamples/blob/master/osx/Markdown/Rakefile[RubyMotionSamples]
 
-The next time you build your project, the +JSONKit+ sources will be downloaded then built and linked against your application executable. If you require a Pod that has dependencies, they will also be properly honored.
+If this is your first time using CocoaPods on your machine, you'll need to let CocoaPods perform some setup with the following command:
+----
+$ [bundle exec] pod setup
+----
 
+Additionally you can tell motion-cocoapods to download your depencies with the following rake task:
+----
+$ rake pod:install
+----
+
+That's it! The +JSONKit+ sources will be downloaded then built and linked against your application executable. If you require a Pod that has dependencies, they will also be properly honored.
+
+For more detailed information and issues please see the gem's http://github.com/HipByte/motion-cocoapods[Github page]
