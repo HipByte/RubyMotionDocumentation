@@ -7,31 +7,26 @@ In this article we will cover how you can integrate the http://cocoapods.org[Coc
 Synopsis
 --------
 
-CocoaPods is the missing dependency manager for Objective-C projects. It is similar to RubyGems but for Objective-C dependencies.
+CocoaPods is the dependency manager for Objective-C projects. It is similar to RubyGems and Bundler, but for Objective-C dependencies.
 
-Dependencies in CocoaPods are called Pods. You can get the list of Pods available from the http://github.com/CocoaPods/Specs[CocoaPods/Specs] GitHub repository.
+Dependencies in CocoaPods are called Pods. You can get the list of available Pods available and more information from http://cocoapods.org.
 
 CocoaPods was originally designed to be integrated in Objective-C Xcode projects, but we worked with the awesome CocoaPods author to make it possible to be used in RubyMotion projects.
-
-You can check the http://cocoapods.org website to get more information about CocoaPods.
 
 Installation
 ------------
 
-First, you will need to install and setup CocoaPods, unless you already have.
+First, you will need to install and setup CocoaPods. Please refer to the http://guides.cocoapods.org/using/getting-started.html#installation[installation guide] on how to install CocoaPods, then run:
 
 ----
-$ sudo gem install cocoapods
 $ pod setup
 ----
 
-The RubyMotion CocoaPods integration also comes as a gem. 
+The http://github.com/HipByte/motion-cocoapods[RubyMotion CocoaPods integration] also comes as a gem and can be installed as follows:
 
 ----
 $ sudo gem install motion-cocoapods
 ----
-
-The code lives in the http://github.com/HipByte/motion-cocoapods[HipByte/motion-cocoapods] GitHub repository.
 
 Usage
 -----
@@ -45,18 +40,40 @@ require 'motion-cocoapods'
 
 Once you do that, you can simply use the +pods+ method of the application configuration object to describe the Pods you want to require, by using the same expressions as you would do in a regular Podfile.
 
-For instance, if you want to require the +JSONKit+ Pod.
+For instance, if you want to make use of the +AFNetworking+ Pod:
 
 ----
 Motion::Project::App.setup do |app|
   # ...
   app.pods do
-    pod 'JSONKit'
+    pod 'AFNetworking'
   end
 end
 ----
 
-That's all you have to do.
+Then you only need to tell your project to run the CocoaPods integration which will download the sources and configure your project to include +AFNetworking+ on the next build:
 
-The next time you build your project, the +JSONKit+ sources will be downloaded then built and linked against your application executable. If you require a Pod that has dependencies, they will also be properly honored.
+----
+$ rake pod:install
+----
 
+Now when you build your project, the +AFNetworking+ sources will be built and linked against your application executable:
+
+----
+$ rake
+     Build ./build/iPhoneSimulator-7.1-Development
+     Build ./vendor/Pods/Pods.xcodeproj [AFNetworking - Release]
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFHTTPRequestOperation.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFHTTPRequestOperationManager.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFHTTPSessionManager.m
+   Compile ./vendor/Pods/AFNetworking/UIKit+AFNetworking/AFNetworkActivityIndicatorManager.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFNetworkReachabilityManager.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFSecurityPolicy.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFURLConnectionOperation.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFURLRequestSerialization.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFURLResponseSerialization.m
+   Compile ./vendor/Pods/AFNetworking/AFNetworking/AFURLSessionManager.m
+      Link ./vendor/Pods/.build/libPods-AFNetworking.a
+     Build ./vendor/Pods/Pods.xcodeproj [Pods - Release]
+      Link ./vendor/Pods/.build/libPods.a
+----
