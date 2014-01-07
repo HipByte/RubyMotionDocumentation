@@ -192,7 +192,8 @@ The following command will print the backtrace of all the running threads in the
     frame #2: 0x015567a7 Foundation`-[NSThread main] + 76
     frame #3: 0x01556706 Foundation`__NSThread__main__ + 1275
     frame #4: 0x031815fb libsystem_pthread.dylib`_pthread_body + 144
-    frame #5: 0x03181485 libsystem_pthread.dylib`_pthread_start + 130----
+    frame #5: 0x03181485 libsystem_pthread.dylib`_pthread_start + 130
+----
 
 Similar to switching frames, the debugger will let you switch threads using the +thread select+ command. This can be useful if you want to inspect a specific Ruby method frame in another running thread. The following command will switch the debugger prompt to the thread #4.
 
