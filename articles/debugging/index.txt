@@ -9,15 +9,15 @@ At the time of this writing, the debugging experience in RubyMotion is still a w
 Synopsis
 --------
 
-The RubyMotion debugger is based on http://www.gnu.org/software/gdb/[GDB], the GNU Project Debugger.
+The RubyMotion debugger is based on http://lldb.llvm.org[LLDB], the LLVM Debugger.
 
-GDB is traditionally used to debug programs written in C-based languages, however, RubyMotion brings Ruby support to GDB, allowing it to connect and introspect RubyMotion processes.
+LLDB is traditionally used to debug programs written in C-based languages, however, RubyMotion brings Ruby support to LLDB, allowing it to connect and introspect RubyMotion processes.
 
-NOTE: The GDB support is at this point experimental and also quite low-level. Our goal is to build a higher-level, friendlier debugger on top of GDB that will provide a better experience for Ruby developers.
+NOTE: The LLDB support is at this point experimental and also quite low-level. Our goal is to build a higher-level, friendlier debugger on top of LLDB that will provide a better experience for Ruby developers.
 
-NOTE: At the time of this writing, http://lldb.llvm.org/[LLDB] (Apple's new debugger) is not ready yet for prime time. We might however eventually switch to LLDB once it matures.
+This document aims at covering the main features that one might need in order to debug a RubyMotion app with LLDB. This document is not a complete LLDB manual. We highly recommend reading http://lldb.llvm.org/tutorial.html[the official LLDB documentation] if an exhaustive guide is needed.
 
-This document aims at covering the main features that one might need in order to debug a RubyMotion app with GDB. This document is not a complete GDB manual. We highly recommend reading the official GDB documentation if an exhaustive guide is needed.
+NOTE: In this guide we will use the longhand versions of all debugger commands, but most, if not all, have shorthand versions which you can find in the http://lldb.llvm.org/tutorial.html[the official LLDB documentation].
 
 Debugging symbols
 -----------------
@@ -55,10 +55,12 @@ This can be done by setting the +no_continue+ option to any value. If set, the d
 ----
 $ rake debug=1 no_continue=1
 [...]
-(gdb) break hello_view.rb:10
-Breakpoint 4 (hello_view.rb:10) pending.
-(gdb) continue
-Continuing.
+(lldb) breakpoint set --file hello_view.rb --line 10
+Breakpoint 3: no locations (pending).
+WARNING:  Unable to resolve breakpoint to any actual locations.
+(lldb) c
+Process 87523 resuming
+[...]
 ----
 
 Saving commands
@@ -71,7 +73,7 @@ The debugger will honor the 'debugger_cmds' file in the root directory of your p
 Only use the name of the file not the full path : hello_view.rb:10 and not app/hello_view.rb:10.
 
 ----
-$ echo "break hello_view.rb:10" > debugger_cmds
+$ echo "breakpoint set --file hello_view.rb --line 10" > debugger_cmds
 $ rake debug=1
 [...]
 ----
@@ -79,32 +81,36 @@ $ rake debug=1
 Managing breakpoints
 --------------------
 
-To set a breakpoint to a given location in the source code, use the +break+ command and pass the location where the debugger should break, using the +file:line+ notation.
+To set a breakpoint to a given location in the source code, use the +breakpoint+ command and pass the location where the debugger should break, using the +--line+ option.
 
 As an example, the following command sets a breakpoint on the 10th line of the 'hello_view.rb' file.
 
 ----
-$ break hello_view.rb:10 
+(lldb) breakpoint set --file hello_view.rb --line 10
 ----
 
-The +info breakpoints+ command can be used to list the breakpoints that have been set in the current debugger environment.
+The +breakpoint list+ command can be used to list the breakpoints that have been set in the current debugger environment.
 
 ----
-(gdb) info breakpoints 
-Num Type           Disp Enb Address    What
-1   breakpoint     keep y   0x0003b656 <rb_exc_raise+6>
-2   breakpoint     keep y   0x94c13827 <malloc_error_break+6>
-3   breakpoint     keep y   0x0000b1b0 in rb_scope__drawRect:__ at hello_view.rb:10
-	breakpoint already hit 1 time
-[...]
+(lldb) breakpoint list
+Current breakpoints:
+1: name = 'rb_exc_raise', locations = 1, resolved = 1
+  1.1: where = Hello`rb_exc_raise, address = 0x00049d70, resolved, hit count = 0 
+
+2: name = 'malloc_error_break', locations = 1, resolved = 1
+  2.1: where = libsystem_malloc.dylib`malloc_error_break, address = 0x030b47f9, resolved, hit count = 0 
+
+3: file = 'hello_view.rb', line = 10, locations = 1, resolved = 1
+  3.1: where = Hello`rb_scope__drawRect:__ + 1034 at hello_view.rb:10, address = 0x0000964a, resolved, hit count = 1 
 ----
 
-As you can see our breakpoint +hello_view.rb:10+ is right there and is enabled. The +enable+ and +disable+ commands can respectively enable or disable a given breakpoint using its number.
+As you can see our breakpoint +hello_view.rb:10+ is right there and is enabled. The +breakpoint enable+ and +breakpoint disable+ commands can respectively enable or disable a given breakpoint using its number.
 
 Since our breakpoint is number 3 in the list, we can disable it like this:
 
 ----
-(gdb) disable 3
+(lldb) breakpoint disable 3
+1 breakpoints disabled.
 ----
 
 Getting the backtrace
@@ -112,58 +118,93 @@ Getting the backtrace
 
 Once you hit a breakpoint, it is often interesting to check out the execution backtrace, which will tell you where the method is called from.
 
-This can be done by using the +backtrace+ command.
+This can be done by using the +thread backtrace+ command.
 
 ----
-Breakpoint 4, rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
-10	      bgcolor = UIColor.blackColor
-(gdb) backtrace
-#0  rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
-#1  0x0000b90f in __unnamed_9 ()
-#2  0x0054b4be in -[UIView(CALayerDelegate) drawLayer:inContext:] ()
-#3  0x01e15a3f in -[CALayer drawInContext:] ()
-#4  0x01e1596b in backing_callback ()
-#5  0x01d27697 in CABackingStoreUpdate_ ()
-#6  0x01e1583c in CA::Layer::display_ ()
-#7  0x01e159ba in -[CALayer _display] ()
-#8  0x01e152b6 in CA::Layer::display ()
-#9  0x01e15994 in -[CALayer display] ()
-#10 0x01e0a0e2 in CA::Layer::display_if_needed ()
+(lldb) thread backtrace
+* thread #1: tid = 0x36e013, 0x0000964a Hello`rb_scope__drawRect:__(self=0x08fa34d0, rect=0x08f8d8a0) + 1034 at hello_view.rb:10, queue = 'com.apple.main-thread, stop reason = breakpoint 3.1
+    frame #0: 0x0000964a Hello`rb_scope__drawRect:__(self=0x08fa34d0, rect=0x08f8d8a0) + 1034 at hello_view.rb:10
+    frame #1: 0x00009d77 Hello`__unnamed_9 + 231
+    frame #2: 0x0065be43 UIKit`-[UIView(CALayerDelegate) drawLayer:inContext:] + 504
+    frame #3: 0x024bb800 QuartzCore`+[CATransaction flush] + 52
+    frame #4: 0x005eed70 UIKit`_UIApplicationHandleEvent + 683
+    frame #5: 0x03add6e1 GraphicsServices`PurpleEventCallback + 46
+    frame #6: 0x01da8ffb CoreFoundation`CFRunLoopRunInMode + 123
+    frame #7: 0x005ec8be UIKit`-[UIApplication _run] + 840
+    frame #8: 0x005eeabb UIKit`UIApplicationMain + 1225
+    frame #9: 0x000024cc Hello`main(argc=1, argv=0xbfffec0c) + 156 at main.mm:15
 ----
 
-Backtrace frames in your code can be identified with the +rb_scope__+ prefix and the file and line information. 
+Backtrace frames in your code can be identified with the +rb_scope__+ prefix and the +file:line+ information.
 
 Frames
 ~~~~~~
 
 Here, the very first frame in the backtrace is the method defined in the breakpoint location: +drawRect:+. The other frames below the breakpoint are native iOS calls. As we can see, our +drawRect:+ method is called by the +UIView+ class, which makes sense.
 
-The +frame+ command lets you switch to a specific frame in the backtrace. By default you will be at the top frame (#0), but assuming you want to go down to frame #4 in order to inspect its context, you can type the following command to do so.
+The +frame+ command lets you switch to a specific frame in the backtrace. By default you will be at the top frame (#0), but assuming you want to go down to frame #2, in order to inspect its context, you can type the following command to do so.
 
 ----
-(gdb) frame 4
-[...]
+(lldb) frame select 2
+frame #2: 0x0065be43 UIKit`-[UIView(CALayerDelegate) drawLayer:inContext:] + 504
+UIKit`-[UIView(CALayerDelegate) drawLayer:inContext:] + 504:
+-> 0x65be43:  calll  0x6156b5                  ; UIGraphicsPopContext
+   0x65be48:  addl   $108, %esp
+   0x65be4b:  popl   %esi
+   0x65be4c:  popl   %edi
 ----
 
-Obviously it mainly matters when you want to go down to a specific Ruby-defined location in the backtrace.
+Obviously it mainly matters when you want to go down to a specific Ruby-defined location in the backtrace, otherwise you’ll only get assembly, as illustrated by the preceding example.
 
 Threads
 ~~~~~~~
 
-The +backtrace+ command only returns the backtrace of the current thread. When dealing with a multithreaded program, you may sometimes want to print the backtrace of all running threads, for instance when you are debugging a race condition.
+The +thread backtrace+ command only returns the backtrace of the current thread. When dealing with a multithreaded program, you may sometimes want to print the backtrace of all running threads, for instance when you are debugging a race condition.
 
 The following command will print the backtrace of all the running threads in the terminal.
 
 ----
-(gdb) thread apply all backtrace
-[...]
-----
+(lldb) thread backtrace all
+* thread #1: tid = 0x36e013, 0x0000964a Hello`rb_scope__drawRect:__(self=0x08fa34d0, rect=0x08f8d8a0) + 1034 at hello_view.rb:10, queue = 'com.apple.main-thread, stop reason = breakpoint 3.1
+    frame #0: 0x0000964a Hello`rb_scope__drawRect:__(self=0x08fa34d0, rect=0x08f8d8a0) + 1034 at hello_view.rb:10
+    frame #1: 0x00009d77 Hello`__unnamed_9 + 231
+    frame #2: 0x0065be43 UIKit`-[UIView(CALayerDelegate) drawLayer:inContext:] + 504
+    frame #3: 0x024bb800 QuartzCore`+[CATransaction flush] + 52
+    frame #4: 0x005eed70 UIKit`_UIApplicationHandleEvent + 683
+    frame #5: 0x03add6e1 GraphicsServices`PurpleEventCallback + 46
+    frame #6: 0x01da8ffb CoreFoundation`CFRunLoopRunInMode + 123
+    frame #7: 0x005ec8be UIKit`-[UIApplication _run] + 840
+    frame #8: 0x005eeabb UIKit`UIApplicationMain + 1225
+    frame #9: 0x000024cc Hello`main(argc=1, argv=0xbfffec0c) + 156 at main.mm:15
 
-Similar to switching frames, the debugger will let you switch threads using the +thread+ command. This can be useful if you want to inspect a specific Ruby method frame in another running thread. The following command will switch the debugger prompt to the thread #4.
+  thread #2: tid = 0x36e04e, 0x031bf992 libsystem_kernel.dylib`kevent64 + 10, queue = 'com.apple.libdispatch-manager
+    frame #0: 0x031bf992 libsystem_kernel.dylib`kevent64 + 10
+    frame #1: 0x02de018e libdispatch.dylib`_dispatch_mgr_invoke + 238
+    frame #2: 0x02ddfeca libdispatch.dylib`_dispatch_mgr_thread + 60
+
+  thread #3: tid = 0x36e04f, 0x031bf046 libsystem_kernel.dylib`__workq_kernreturn + 10
+    frame #0: 0x031bf046 libsystem_kernel.dylib`__workq_kernreturn + 10
+    frame #1: 0x03182dcf libsystem_pthread.dylib`_pthread_wqthread + 372
+
+  thread #4: tid = 0x36e050, 0x031bdd2e libsystem_kernel.dylib`accept$UNIX2003 + 10
+    frame #0: 0x031bdd2e libsystem_kernel.dylib`accept$UNIX2003 + 10
+    frame #1: 0x001397b6 Hello`-[RMREPL start] + 134
+    frame #2: 0x015567a7 Foundation`-[NSThread main] + 76
+    frame #3: 0x01556706 Foundation`__NSThread__main__ + 1275
+    frame #4: 0x031815fb libsystem_pthread.dylib`_pthread_body + 144
+    frame #5: 0x03181485 libsystem_pthread.dylib`_pthread_start + 130----
+
+Similar to switching frames, the debugger will let you switch threads using the +thread select+ command. This can be useful if you want to inspect a specific Ruby method frame in another running thread. The following command will switch the debugger prompt to the thread #4.
 
 ----
-(gdb) thread 4
-[...]
+(lldb) thread select 4
+* thread #4: tid = 0x36e050, 0x031bdd2e libsystem_kernel.dylib`accept$UNIX2003 + 10
+    frame #0: 0x031bdd2e libsystem_kernel.dylib`accept$UNIX2003 + 10
+libsystem_kernel.dylib`accept$UNIX2003 + 10:
+-> 0x31bdd2e:  jae    0x31bdd3e                 ; accept$UNIX2003 + 26
+   0x31bdd30:  calll  0x31bdd35                 ; accept$UNIX2003 + 17
+   0x31bdd35:  popl   %edx
+   0x31bdd36:  movl   29423(%edx), %edx
 ----
 
 Inspecting objects
@@ -181,34 +222,42 @@ In RubyMotion, the +self+ argument is a pointer to the +self+ object exposed in 
 We can inspect the values of both +self+ and +rect+ by using the +print-ruby-object+ command. This RubyMotion-defined command sends the +inspect+ message to the given object and returns its value. The command can also be called using the +pro+ shortcut which we will use as a convenience.
 
 ----
-Breakpoint 4, rb_scope__drawRect:__ (self=0x43a00003, rect=0x9353a10) at hello_view.rb:10
-10            bgcolor = UIColor.blackColor
-(gdb) print-ruby-object self
-#<HelloView:0x934d580>
-(gdb) pro rect
-#<CGRect origin=#<CGPoint x=0.0 y=0.0> size=#<CGSize width=320.0 height=480.0>>
+frame #0: 0x0000964a Hello`rb_scope__drawRect:__(self=0x08fa34d0, rect=0x08f8d8a0) + 1034 at hello_view.rb:10
+   7   	      end
+   8   	      text = "ZOMG!"
+   9   	    else
+-> 10  	      bgcolor = UIColor.blackColor
+   11  	      text = @touches ? "Touched #{@touches} times!" : "Hello RubyMotion!"
+   12  	    end
+   13  	
+(lldb) print-ruby-object self
+#<HelloView:0x8fa34d0>
+(lldb) pro rect
+#<CGRect origin=#<CGPoint x=0.0 y=0.0> size=#<CGSize width=320.0 height=568.0>>
 ----
 
-The list of local variables can be printed using the +info locals+ command. The list will also include the addresses of each local variable.
+The list of local variables can be printed using the +frame variable+ command. The list will also include the addresses of each local variable.
 
 ----
-(gdb) info locals
-bgcolor = (VALUE) 0x75a81d0
-red = (VALUE) 0x4
-green = (VALUE) 0x4
-blue = (VALUE) 0x4
-text = (VALUE) 0x75a9020
-font = (VALUE) 0x4
+(lldb) frame variable
+(void *) self = 0x08fa34d0
+(void *) rect = 0x08f8d8a0
+(void *) bgcolor = 0x08f931c0
+(void *) red = 0x00000004
+(void *) green = 0x00000004
+(void *) blue = 0x00000004
+(void *) text = 0x09c55230
+(void *) font = 0x00000004
 ----
 
 These local variables can also be individually inspected on the terminal by using the +pro+ command.
 
 ----
-(gdb) pro bgcolor
-#<UICachedDeviceWhiteColor:0x75a81d0>
-(gdb) pro text   
+(lldb) pro bgcolor
+#<UICachedDeviceWhiteColor:0x8f931c0>
+(lldb) pro text
 "Hello RubyMotion!"
-(gdb) pro font
+(lldb) pro font
 nil
 ----
 
@@ -220,54 +269,65 @@ Instance variables of an object can be printed using the +print-ruby-ivar+ comma
 If the command is given two arguments, the first one is the object on which the instance variable will be retrieved, and the second one must be a string representing the instance variable that you want to get. Make sure to include the +@+ character in the name.
 
 ----
-(gdb) pri self "@touches"
+(lldb) pri self "@touches"
 2
 ----
 
 When called with only one argument, the command assumes that you want to retrieve the given instance variable from +self+.
 
 ----
-(gdb) pri "@touches"
+(lldb) pri "@touches"
 2
 ----
 
 Control flow
 ------------
 
-The +next+ command will continue the execution of the program until the next source-level location. This is usually the very next line in the Ruby source code. You should see in the terminal the relevant source code line.
+The +next+ command will continue the execution of the program until the next source-level location. This is usually the very next line in the Ruby source code. This means that the debugger has not yet executed the line that it indicates is the current line, keep this in mind when inspecting variables and their values.
 
 ----
-(gdb) next
-15	    UIBezierPath.bezierPathWithRect(frame).fill
-(gdb) next
-17	    font = UIFont.systemFontOfSize(24)
-(gdb) next
-18	    UIColor.whiteColor.set
-(gdb) next
-19	    text.drawAtPoint(CGPoint.new(10, 20), withFont:font)
+* thread #1: tid = 0x3702a0, 0x0000964a Hello`rb_scope__drawRect:__(self=0x08ed1600, rect=0x08d91620) + 1034 at hello_view.rb:10, queue = 'com.apple.main-thread, stop reason = breakpoint 3.1
+    frame #0: 0x0000964a Hello`rb_scope__drawRect:__(self=0x08ed1600, rect=0x08d91620) + 1034 at hello_view.rb:10
+   7   	      end
+   8   	      text = "ZOMG!"
+   9   	    else
+-> 10  	      bgcolor = UIColor.blackColor
+   11  	      text = @touches ? "Touched #{@touches} times!" : "Hello RubyMotion!"
+   12  	    end
+   13  	
+(lldb) next
+Process 87162 stopped
+* thread #1: tid = 0x3702a0, 0x000096c9 Hello`rb_scope__drawRect:__(self=0x08ed1600, rect=0x08d91620) + 1161 at hello_view.rb:11, queue = 'com.apple.main-thread, stop reason = step over
+    frame #0: 0x000096c9 Hello`rb_scope__drawRect:__(self=0x08ed1600, rect=0x08d91620) + 1161 at hello_view.rb:11
+   8   	      text = "ZOMG!"
+   9   	    else
+   10  	      bgcolor = UIColor.blackColor
+-> 11  	      text = @touches ? "Touched #{@touches} times!" : "Hello RubyMotion!"
+   12  	    end
+   13  	
+   14  	    bgcolor.set 
 ----
 
 The +continue+ command will continue the execution of the program until it reaches a breakpoint.
 
 ----
-(gdb) continue
-[...]
+(lldb) continue
+Process 87162 resuming
 ----
 
 When the program runs, you can always stop its execution and go back to the debugger prompt by typing the +control+c+ (+^C+) keyboard shortcut.
 
 ----
 ^C
-Program received signal SIGINT, Interrupt.
-0x910217d2 in mach_msg_trap ()
-(gdb)
+Process 87162 stopped
+[...]
+(lldb)
 ----
 
 If you want to quit the debugger, just type the +quit+ command and confirm that you want to exit. It will terminate the application and return you back to the shell prompt.
 
 ----
-(gdb) quit
-The program is running.  Quit anyway (and detach it)? (y or n) y
-Detaching from process 91850.
+(lldb) quit
+Quitting LLDB will detach from one or more processes. Do you really want to proceed: [Y/n] y
 $
 ----
