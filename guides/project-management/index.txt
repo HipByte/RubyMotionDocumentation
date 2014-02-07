@@ -175,14 +175,14 @@ Here is a table summarizing project types and key/value objects.
 [cols=".^,.^,.^",options="header,autowidth"]
 |====
 | Project Type | Key | Discussion
-.6+|+:xcode+ | +:xcodeproj+ | Name of the Xcode project file to use. Optional if there is one '.xcodeproj' file in the directory.
+.7+|+:xcode+ | +:xcodeproj+ | Name of the Xcode project file to use. Optional if there is one '.xcodeproj' file in the directory.
 | +:target+ | Name of the target to build. If not provided, the default target will be used. Cannot be defined at the same time as +:scheme+.
 | +:scheme+ | Name of the scheme to build. If not provided, the default scheme will be used. Cannot be defined at the same time as +:target+.
 | +:configuration+ | Name of the configuration to build. If not provided, +"Release"+ will be used.
 | +:headers_dir+ | Path to the directory that contains public headers files, declaring APIs that will be used by the RubyMotion project. The path should be relative to the path provided to +vendor_project+, for example +"Sources/Headers"+. This key is optional.
 | +:products+ | An +Array+ containing the names of products to use in the RubyMotion project, for example +["libfoo.a"]+. This key can be used when the project builds more than one product and you want to filter what will be used by the app. If not provided, all +.a+ libraries built will be used.
 | +:bridgesupport_cflags+ | +CFLAGS+ to use when generating BridgeSupport metadata, for example +"-fobjc-arc"+ to turn on ARC. This key is optional.
-.3+| +:static+ | +:products+ | An +Array+ containing the names of static libraries to use. The default value is the list of all '.a' files in the vendor project directory.
+.4+| +:static+ | +:products+ | An +Array+ containing the names of static libraries to use. The default value is the list of all '.a' files in the vendor project directory.
 | +:source_files+ | An +Array+ of all source files and headers to compile. The default value is the list of all files in the vendor project directory matching +$$"**/*.{c,m,cpp,cxx,mm,h}"$$+.
 | +:cflags+ | +CFLAGS+ to use for compilation, for example +"-fobjc-arc"+ to turn on ARC. This key is optional.
 | +:bridgesupport_cflags+ | +CFLAGS+ to use specifically when generating BridgeSupport metadata, for example +"-fobjc-arc"+ to turn on ARC. This key is optional and defaults to +:cflags+.
