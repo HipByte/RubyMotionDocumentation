@@ -115,6 +115,8 @@ OS X Options
 |+copyright+| The human-readable copyright that will be used in the application's property file, as a +String+. The default value is +"Copyright (c) CURRENT_DATE CURRENT_USER. All Right Reserved."+.
 |+embedded_frameworks+| List of 3rd-party frameworks to embed in the application bundle, as an +Array+ of +String+ objects representing filesystem paths. For example, +["../MyFramework/framework"]+. The default value is an empty array.
 |+external_frameworks+| List of frameworks to use that are outside of +/System/Library/Frameworks+ and should not be embedded, as an +Array+ of +String+ objects representing filesystem paths. For example, +["/Library/Frameworks/iTunesLibrary.framework"]+. The default value is an empty array.
+|+codesign_for_development+| Whether it codesigns the application for development build. If +false+, it skips codesigning. The default value is +false+.
+|+codesign_for_release+| Whether it codesigns the application for release build. If +false+, it skips codesigning. The default value is +true+.
 |====
 
 Providing Custom Values
