@@ -424,6 +424,7 @@ Following is a table summarizing the pointers one can create.
 |=======================================================
 | C Type Pointer | Runtime Type String | Shortcut Symbol
 | id *  | "@" | :object
+| BOOL *  | "B" | :bool / :boolean
 | char *  | "c" | :char
 | unsigned char *  | "C" | :uchar
 | short *  | "s" | :short
