@@ -54,6 +54,11 @@ If you happened to have an older version of Xcode installed on your machine befo
 $ sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
 ----
 
+Text Editor
+-----------
+
+After having installed RubyMotion you need to set up a text editor for development. If you already have a preferred editor such as RubyMine, Vim or TextMate you should be good to go. Please read our http://www.rubymotion.com/developer-center/articles/editors[editors] guide for more information.
+
 Software Updates
 ----------------
 
