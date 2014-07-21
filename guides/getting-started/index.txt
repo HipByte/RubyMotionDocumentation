@@ -198,7 +198,7 @@ Let's run the default task.
 $ rake
 ----
 
-This should build our project then start the simulator, and you should see... an empty window! It's actually normal, we haven't written any code yet!
+This should build our project then start the app, and you should see... an empty window! It's actually normal, we haven't written any code yet!
 
 If you look inside the 'app' directory you will see an 'app_delegate.rb' file, which is created by default. This file implements the AppDelegate class, which is responsible for controlling your application.
 
