@@ -73,8 +73,8 @@ $ sudo motion update
 You can run the following command to check the version of RubyMotion installed on your computer.
 
 ----
-$ motion -v
-1.0
+$ motion --version
+2.24
 ----
 
 Once a day, the RubyMotion build system pings the software update server in order to see if a new version of RubyMotion is available to install.
