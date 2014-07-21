@@ -6,6 +6,15 @@ RubyMotion was designed so that developers do not need to switch to a particular
 
 This article covers the text editors that provide support for RubyMotion. We try to keep this article up-to-date following the contributions from the community.
 
+RubyMine
+--------
+
+http://http://www.jetbrains.com/ruby/[RubyMine] is a commercial IDE for Ruby built on JetBrains' IntelliJ IDEA platform.
+
+It is at the time of this writing the best environment to work with RubyMotion. RubyMine features context-based auto-completion, point-and-click debugging (on both the simulator and the device), inline documentation, and so on.
+
+Please refer to the http://confluence.jetbrains.com/display/RUBYDEV/Getting+Started+with+RubyMotion[Getting Started with RubyMotion] guide on JetBrains' developer website for more information.
+
 TextMate
 --------
 
