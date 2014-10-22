@@ -134,16 +134,15 @@ Download the https://developer.android.com/tools/sdk/ndk/index.html[Mac OS X 64-
 
 NOTE: It is important that you download the right NDK package. The Mac OS X 32-bit package will not work with RubyMotion at the time of this writing.
 
-The Android NDK package is a self-contained installer. Once downloaded, create the '~/android-rubymotion-ndk' directory, go in there and run the executable:
+The Android NDK package is a self-contained installer. Once downloaded, you can mark the binary as executable, run it, then rename it as '~/android-rubymotion/ndk':
 
 ----
-$ mkdir ~/android-rubymotion/ndk
-$ cd ~/android-rubymotion/ndk
 $ chmod +x ~/Downloads/android-ndk-r10c-darwin-x86_64.bin
 $ ~/Downloads/android-ndk-r10c-darwin-x86_64.bin
+$ mv ~/Downloads/android-ndk-r10c ~/android-rubymotion/ndk
 ----
 
-To confirm that the installation was successful, this is what the directory should contain (at the time of this writing):
+To confirm that the installation was successful, this is what the '~/android-rubymotion/ndk' should contain (at the time of this writing):
 
 ----
 $ ls ~/android-rubymotion/ndk
