@@ -1,8 +1,9 @@
 RubyMotion Project Management Guide
 ===================================
-Laurent Sansonetti <lrz@hipbyte.com>
 
 In this guide we will explain how to create new RubyMotion projects, then configure and maintain them.
+
+NOTE: This document is only valid for RubyMotion for iOS and OS X projects. We will be delivering a similar document for Android soon. In the meantime, we suggest you look at the https://github.com/HipByte/RubyMotionSamples/tree/master/android[sample code].
 
 Creation
 --------
