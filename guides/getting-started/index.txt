@@ -143,7 +143,7 @@ $ chmod +x ~/Downloads/android-ndk-r10c-darwin-x86_64.bin
 $ ~/Downloads/android-ndk-r10c-darwin-x86_64.bin
 ----
 
-To confirm that the copy was successful, this is what it should contain (at the time of this writing):
+To confirm that the installation was successful, this is what the directory should contain (at the time of this writing):
 
 ----
 $ ls ~/android-rubymotion/ndk
